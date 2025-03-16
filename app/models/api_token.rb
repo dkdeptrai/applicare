@@ -5,6 +5,5 @@ class ApiToken < ApplicationRecord
   private
   def generate_token
     self.token = SecureRandom.hex(32)
-
   end
 end

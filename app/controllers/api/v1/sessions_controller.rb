@@ -7,7 +7,7 @@ module Api
           token = user.generate_jwt
           render json: { token: token }
         else
-          render json: { error: 'Invalid email or password' }, status: :unauthorized
+          render json: { error: "Invalid email or password" }, status: :unauthorized
         end
       end
     end

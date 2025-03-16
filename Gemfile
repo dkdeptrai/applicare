@@ -59,3 +59,17 @@ end
 
 gem "tailwindcss-rails", "~> 4.2"
 gem "tailwindcss-ruby", "~> 4.0"
+
+gem "rswag", "~> 2.16"
+
+gem "rspec", "~> 3.13"
+
+gem "rspec-rails", "~> 7.1"
+
+gem "jwt", "~> 2.10"
+
+gem "annotate", "~> 2.6"
+
+gem "factory_bot_rails", "~> 6.4"
+
+gem "faker", "~> 3.5"
