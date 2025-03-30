@@ -324,6 +324,8 @@ GEM
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
+    shoulda-matchers (6.4.0)
+      activesupport (>= 5.2.0)
     solid_cable (3.0.7)
       actioncable (>= 7.2)
       activejob (>= 7.2)
@@ -406,8 +408,8 @@ DEPENDENCIES
   bootsnap
   brakeman
   debug
-  factory_bot_rails (~> 6.4)
-  faker (~> 3.5)
+  factory_bot_rails
+  faker
   importmap-rails
   jbuilder
   jwt (~> 2.10)
@@ -417,9 +419,10 @@ DEPENDENCIES
   puma (>= 5.0)
   rails (~> 8.0.1)
   rspec (~> 3.13)
-  rspec-rails (~> 7.1)
+  rspec-rails
   rswag (~> 2.16)
   rubocop-rails-omakase
+  shoulda-matchers
   solid_cable
   solid_cache
   solid_queue

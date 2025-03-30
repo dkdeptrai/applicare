@@ -1,13 +1,23 @@
 Rails.application.routes.draw do
   mount Rswag::Ui::Engine => "/api-docs"
   mount Rswag::Api::Engine => "/api-docs"
+
+  # Web routes
   resource :session
+  resources :users
   resources :passwords, param: :token
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+
+  get "/verify_email/:token", to: "users#verify_email", as: "verify_email"
+
+  # API routes
   namespace :api do
     namespace :v1 do
-      resources :users, only: [ :show ]
-      resources :sessions, only: [ :create ]
+      resources :users, only: [ :show, :create ]
+      resources :sessions, only: [ :create, :destroy ]
+
+      # Email verification
+      post "/verify_email", to: "email_verifications#verify"
+      post "/resend_verification", to: "email_verifications#resend"
     end
   end
 
@@ -20,5 +30,5 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  # root "posts#index"
+  root "users#new"
 end

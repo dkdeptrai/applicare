@@ -4,26 +4,127 @@ info:
   title: API V1
   version: v1
 paths:
+  "/api/v1/verify_email":
+    post:
+      summary: Verifies a user email using a token
+      tags:
+        - Email Verification
+      parameters: []
+      responses:
+        "200":
+          description: email verified successfully
+        "422":
+          description: verification link expired
+        "404":
+          description: invalid verification token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+              required:
+                - token
+  "/api/v1/resend_verification":
+    post:
+      summary: Resends verification email
+      tags:
+        - Email Verification
+      parameters: []
+      responses:
+        "200":
+          description: verification email not sent - security through obscurity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required:
+                - email
+  "/api/v1/sessions":
+    post:
+      summary: Creates a session (logs in)
+      tags:
+        - Sessions
+      parameters: []
+      responses:
+        "200":
+          description: user logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user_id:
+                    type: integer
+                required:
+                  - token
+                  - user_id
+        "401":
+          description: unauthorized - email not verified
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+  "/api/v1/sessions/{id}":
+    delete:
+      summary: Destroys a session (logs out)
+      tags:
+        - Sessions
+      parameters:
+        - name: id
+          in: path
+          description: ID is optional
+          required: true
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT token
+          schema:
+            type: string
+      responses:
+        "200":
+          description: user logged out
+        "401":
+          description: unauthorized
   "/api/v1/users/{id}":
     get:
       summary: Retrieves a user
       tags:
-      - Users
+        - Users
       parameters:
-      - name: id
-        in: path
-        description: ID of the user
-        required: true
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        required: true
-        description: JWT token
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT token
+          schema:
+            type: string
       responses:
-        '200':
+        "200":
           description: user found
           content:
             application/json:
@@ -34,16 +135,54 @@ paths:
                     type: integer
                   email_address:
                     type: string
-                  password_digest:
+                  email_verified:
+                    type: boolean
+                  created_at:
                     type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
                 required:
-                - id
-                - email_address
-                - password_digest
-        '404':
+                  - id
+                  - email_address
+                  - email_verified
+        "404":
           description: user not found
+        "401":
+          description: unauthorized
+  "/api/v1/users":
+    post:
+      summary: Creates a user
+      tags:
+        - Users
+      parameters: []
+      responses:
+        "201":
+          description: user created
+        "422":
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email_address:
+                      type: string
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
+                  required:
+                    - email_address
+                    - password
+                    - password_confirmation
 servers:
-- url: https://{defaultHost}
-  variables:
-    defaultHost:
-      default: www.example.com
+  - url: https://{defaultHost}
+    variables:
+      defaultHost:
+        default: www.example.com

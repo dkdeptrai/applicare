@@ -11,12 +11,12 @@ module JwtAuthenticable
     token = request.headers["Authorization"]&.split(" ")&.last
 
     if token.present?
-      begin
-        decoded_token = JwtToken.decode(token)
-        @current_user = User.find(decoded_token[:user_id])
-      rescue JWT::DecodeError, ActiveRecord::RecordNotFound
-        render json: { error: "Unauthorized" }, status: :unauthorized
+      decoded_token = JwtToken.decode(token)
+      if decoded_token.present? && decoded_token[:user_id].present?
+        @current_user = User.find_by(id: decoded_token[:user_id])
+        return if @current_user
       end
+      render json: { error: "Unauthorized" }, status: :unauthorized
     else
       render json: { error: "Token not provided" }, status: :unauthorized
     end

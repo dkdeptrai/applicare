@@ -1,0 +1,10 @@
+<h1>My Profile</h1>
+
+<div class="profile-info">
+  <p><strong>Email:</strong> <%= @user.email_address %></p>
+  <p><strong>Account created:</strong> <%= @user.created_at.strftime("%B %d, %Y") %></p>
+</div>
+
+<div class="profile-actions">
+  <%= link_to "Edit Profile", edit_user_path, class: "button" %>
+</div> 

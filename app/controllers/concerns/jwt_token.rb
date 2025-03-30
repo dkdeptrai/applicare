@@ -10,9 +10,12 @@ module JwtToken
   end
 
   def self.decode(token)
-    decoded = JWT.decode(token, SECRET_KEY)[0]
-    HashWithIndifferentAccess.new decoded
-  rescue JWT::DecodeError
-    nil
+    return nil if token.nil?
+    begin
+      decoded = JWT.decode(token, SECRET_KEY)[0]
+      HashWithIndifferentAccess.new decoded
+    rescue JWT::DecodeError
+      nil
+    end
   end
 end
