@@ -37,10 +37,16 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :test
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
+  config.action_mailer.default_url_options = { host: "test.example.com" }
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
+
+  # Raise exceptions for disallowed deprecations.
+  config.active_support.disallowed_deprecation_behavior = :raise
+
+  # Tell Active Support which deprecation messages to disallow.
+  config.active_support.disallowed_deprecation_warnings = []
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true

@@ -18,7 +18,7 @@ gem "stimulus-rails"
 gem "jbuilder"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.7"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -49,6 +49,11 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem "faker"
+  gem "shoulda-matchers"
 end
 
 group :development do
@@ -56,3 +61,14 @@ group :development do
   gem "web-console"
 end
 
+
+gem "tailwindcss-rails", "~> 4.2"
+gem "tailwindcss-ruby", "~> 4.0"
+
+gem "rswag", "~> 2.16"
+
+gem "rspec", "~> 3.13"
+
+gem "jwt", "~> 2.10"
+
+gem "annotate", "~> 2.6"
