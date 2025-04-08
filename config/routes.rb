@@ -7,17 +7,12 @@ Rails.application.routes.draw do
   resources :users
   resources :passwords, param: :token
 
-  get "/verify_email/:token", to: "users#verify_email", as: "verify_email"
-
   # API routes
   namespace :api do
     namespace :v1 do
       resources :users, only: [ :show, :create ]
       resources :sessions, only: [ :create, :destroy ]
-
-      # Email verification
-      post "/verify_email", to: "email_verifications#verify"
-      post "/resend_verification", to: "email_verifications#resend"
+      resources :bookings
     end
   end
 

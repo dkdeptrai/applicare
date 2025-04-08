@@ -21,4 +21,8 @@ module JwtAuthenticable
       render json: { error: "Token not provided" }, status: :unauthorized
     end
   end
+
+  def current_user
+    @current_user
+  end
 end
