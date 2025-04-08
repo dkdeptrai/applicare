@@ -14,8 +14,6 @@ module Api
         user = User.new(user_params)
 
         if user.save
-          # Email verification disabled for now
-          # user.send_verification_email
           render json: { message: "User created successfully. You can now log in." }, status: :created
         else
           render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
@@ -25,7 +23,7 @@ module Api
       private
 
       def user_params
-        params.require(:user).permit(:email_address, :password, :password_confirmation)
+        params.require(:user).permit(:name, :email_address, :password, :password_confirmation)
       end
     end
   end

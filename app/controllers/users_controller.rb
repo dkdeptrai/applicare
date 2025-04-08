@@ -9,8 +9,6 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      # Email verification disabled for now
-      # @user.send_verification_email
       redirect_to new_session_path, notice: "Account created successfully! You can now log in."
     else
       render :new, status: :unprocessable_entity
@@ -18,8 +16,7 @@ class UsersController < ApplicationController
   end
 
   def verify_email
-    # Email verification disabled for now
-    redirect_to new_session_path, notice: "Email verification is currently disabled. You can log in directly."
+    redirect_to new_session_path, notice: "Email verification is disabled. You can log in directly."
   end
 
   def show

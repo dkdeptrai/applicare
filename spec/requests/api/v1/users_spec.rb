@@ -1,8 +1,8 @@
 require 'swagger_helper'
 
 RSpec.describe 'Users API', type: :request do
-  let(:verified_user) { create(:user, :verified) }
-  let(:token) { JwtToken.encode({ user_id: verified_user.id }, exp: 7.days.from_now) }
+  let(:user) { create(:user) }
+  let(:token) { JwtToken.encode({ user_id: user.id }, exp: 7.days.from_now) }
 
   path '/api/v1/users/{id}' do
     get 'Retrieves a user' do
@@ -15,14 +15,14 @@ RSpec.describe 'Users API', type: :request do
         schema type: :object,
                properties: {
                  id: { type: :integer },
+                 name: { type: :string },
                  email_address: { type: :string },
-                 email_verified: { type: :boolean },
                  created_at: { type: :string, format: 'date-time' },
                  updated_at: { type: :string, format: 'date-time' }
                },
-               required: %w[id email_address email_verified]
+               required: %w[id name email_address]
 
-        let(:id) { verified_user.id }
+        let(:id) { user.id }
         let(:'Authorization') { "Bearer #{token}" }
         run_test!
       end
@@ -34,7 +34,7 @@ RSpec.describe 'Users API', type: :request do
       end
 
       response '401', 'unauthorized' do
-        let(:id) { verified_user.id }
+        let(:id) { user.id }
         let(:'Authorization') { "Bearer invalid_token" }
 
         run_test! do
@@ -56,17 +56,18 @@ RSpec.describe 'Users API', type: :request do
           user: {
             type: :object,
             properties: {
+              name: { type: :string },
               email_address: { type: :string },
               password: { type: :string },
               password_confirmation: { type: :string }
             },
-            required: %w[email_address password password_confirmation]
+            required: %w[name email_address password password_confirmation]
           }
         }
       }
 
       response '201', 'user created' do
-        let(:user) { { user: { email_address: 'new@example.com', password: 'password123', password_confirmation: 'password123' } } }
+        let(:user) { { user: { name: 'Test User', email_address: 'new@example.com', password: 'password123', password_confirmation: 'password123' } } }
         run_test!
       end
 

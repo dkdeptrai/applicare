@@ -9,15 +9,15 @@ RSpec.describe 'Sessions API', type: :request do
       parameter name: :login_params, in: :body, schema: {
         type: :object,
         properties: {
-          email: { type: :string },
+          email_address: { type: :string },
           password: { type: :string }
         },
-        required: %w[email password]
+        required: %w[email_address password]
       }
 
       response '200', 'user logged in' do
-        let(:user) { create(:user, :verified, password: 'password123') }
-        let(:login_params) { { email: user.email_address, password: 'password123' } }
+        let(:user) { create(:user, password: 'password123') }
+        let(:login_params) { { email_address: user.email_address, password: 'password123' } }
 
         schema type: :object,
                properties: {
@@ -34,13 +34,7 @@ RSpec.describe 'Sessions API', type: :request do
       end
 
       response '401', 'unauthorized - invalid credentials' do
-        let(:login_params) { { email: 'wrong@example.com', password: 'wrongpassword' } }
-        run_test!
-      end
-
-      response '401', 'unauthorized - email not verified' do
-        let(:user) { create(:user, :unverified, password: 'password123') }
-        let(:login_params) { { email: user.email_address, password: 'password123' } }
+        let(:login_params) { { email_address: 'wrong@example.com', password: 'wrongpassword' } }
         run_test!
       end
     end
@@ -54,7 +48,7 @@ RSpec.describe 'Sessions API', type: :request do
       parameter name: 'Authorization', in: :header, type: :string, required: true, description: 'JWT token'
 
       response '200', 'user logged out' do
-        let(:user) { create(:user, :verified) }
+        let(:user) { create(:user) }
         let(:token) { JwtToken.encode({ user_id: user.id }, exp: 7.days.from_now) }
         let(:id) { 'current' }
         let(:'Authorization') { "Bearer #{token}" }

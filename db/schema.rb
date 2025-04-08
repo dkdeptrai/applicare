@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_10_200000) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_08_143310) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,64 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_200000) do
     t.datetime "updated_at", null: false
     t.index ["token"], name: "index_api_tokens_on_token"
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
+  end
+
+  create_table "appliances", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "brand", null: false
+    t.string "model", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "availabilities", force: :cascade do |t|
+    t.time "start_time"
+    t.time "end_time"
+    t.integer "day_of_week"
+    t.bigint "repairer_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["repairer_id"], name: "index_availabilities_on_repairer_id"
+  end
+
+  create_table "bookings", force: :cascade do |t|
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.string "status"
+    t.text "address"
+    t.text "notes"
+    t.bigint "repairer_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "service_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["repairer_id"], name: "index_bookings_on_repairer_id"
+    t.index ["service_id"], name: "index_bookings_on_service_id"
+    t.index ["user_id"], name: "index_bookings_on_user_id"
+  end
+
+  create_table "repairers", force: :cascade do |t|
+    t.decimal "hourly_rate"
+    t.integer "service_radius"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name", null: false
+    t.string "email_address", null: false
+    t.string "password_digest", null: false
+    t.index ["email_address"], name: "index_repairers_on_email_address", unique: true
+  end
+
+  create_table "services", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.integer "duration_minutes"
+    t.decimal "base_price"
+    t.bigint "repairer_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "appliance_id", null: false
+    t.index ["appliance_id"], name: "index_services_on_appliance_id"
+    t.index ["repairer_id"], name: "index_services_on_repairer_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -38,12 +96,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_200000) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "email_verified", default: false
-    t.string "email_verification_token"
-    t.datetime "email_verification_sent_at"
+    t.string "name", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "availabilities", "repairers"
+  add_foreign_key "bookings", "repairers"
+  add_foreign_key "bookings", "services"
+  add_foreign_key "bookings", "users"
+  add_foreign_key "services", "appliances"
+  add_foreign_key "services", "repairers"
   add_foreign_key "sessions", "users"
 end
