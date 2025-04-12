@@ -219,6 +219,69 @@ paths:
           description: booking not found
         '401':
           description: unauthorized
+  "/api/v1/repairers/{repairer_id}/calendar/{year}/{month}":
+    parameters:
+    - name: repairer_id
+      in: path
+      description: ID of the repairer
+      required: true
+      schema:
+        type: string
+    - name: year
+      in: path
+      description: Year for the calendar view
+      required: true
+      schema:
+        type: integer
+    - name: month
+      in: path
+      description: Month for the calendar view (1-12)
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieves the monthly availability calendar for a repairer
+      tags:
+      - Repairers
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  year:
+                    type: integer
+                    example: 2025
+                  month:
+                    type: integer
+                    example: 4
+                  calendar:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        available:
+                          type: boolean
+                          description: Indicates if the repairer has any availability
+                            on this day
+                      required:
+                      - available
+                    description: Object mapping dates (YYYY-MM-DD) to their availability
+                      status
+                required:
+                - year
+                - month
+                - calendar
+        '400':
+          description: invalid parameters
+        '404':
+          description: repairer not found
+        '401':
+          description: token not provided
   "/api/v1/sessions":
     post:
       summary: Creates a session (logs in)

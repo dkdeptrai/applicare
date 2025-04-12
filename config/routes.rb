@@ -13,6 +13,9 @@ Rails.application.routes.draw do
       resources :users, only: [ :show, :create ]
       resources :sessions, only: [ :create, :destroy ]
       resources :bookings
+      resources :repairers, only: [] do
+        get "calendar/:year/:month", to: "repairers#calendar", on: :member
+      end
     end
   end
 
