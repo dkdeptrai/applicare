@@ -1,4 +1,10 @@
 class Repairer < ApplicationRecord
+  geocoded_by :address # if you have an address field to geocode from
+  # If you only store lat/lon and don't geocode from address, you might not need geocoded_by
+  # but you DO need to specify the columns for reverse geocoding and distance calculations:
+  reverse_geocoded_by :latitude, :longitude # Assuming you have these columns
+  # after_validation :geocode # Omit if you manually set lat/lon
+
   has_many :services, dependent: :destroy
   has_many :availabilities, dependent: :destroy
   has_many :bookings, foreign_key: :repairer_id, dependent: :destroy

@@ -44,6 +44,34 @@ module Api
         render json: { year: year, month: month, calendar: calendar_data }
       end
 
+      # GET /api/v1/repairers/nearby?latitude=...&longitude=...&radius=...
+      def nearby
+        latitude = params[:latitude]
+        longitude = params[:longitude]
+        radius = params[:radius]&.to_f || 10.0 # Default radius 10km
+
+        unless latitude.present? && longitude.present?
+          render json: { error: "Latitude and longitude are required" }, status: :bad_request
+          return
+        end
+
+        begin
+          lat_f = Float(latitude)
+          lon_f = Float(longitude)
+        rescue ArgumentError, TypeError
+          render json: { error: "Invalid latitude or longitude format" }, status: :bad_request
+          return
+        end
+
+        unless radius > 0
+          render json: { error: "Radius must be a positive number" }, status: :bad_request
+          return
+        end
+
+        @repairers = Repairer.near([ lat_f, lon_f ], radius, units: :km)
+        render json: @repairers, each_serializer: RepairerSerializer
+      end
+
       def destroy
         @repairer.destroy
         head :no_content

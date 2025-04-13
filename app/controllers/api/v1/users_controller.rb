@@ -3,9 +3,10 @@ module Api
     class UsersController < BaseController
       skip_before_action :authenticate_request, only: [ :create ]
 
+      # GET /api/v1/users/:id
       def show
         user = User.find(params[:id])
-        render json: user, except: [ :password_digest, :email_verification_token ]
+        render json: user, serializer: UserSerializer # Use UserSerializer
       rescue ActiveRecord::RecordNotFound
         render json: { error: "User not found" }, status: :not_found
       end

@@ -31,7 +31,39 @@ RSpec.configure do |config|
             }
           }
         }
-      ]
+      ],
+      components: {
+        schemas: {
+          error: {
+            type: :object,
+            properties: {
+              error: { type: :string, description: "Error message" }
+            },
+            required: [ 'error' ]
+          },
+          repairer: {
+            type: :object,
+            properties: {
+              id: { type: :integer, description: 'Repairer ID' },
+              name: { type: :string, description: 'Repairer name' },
+              email_address: { type: :string, format: :email, description: 'Repairer email' },
+              hourly_rate: { type: :number, format: :float, description: 'Hourly rate' },
+              service_radius: { type: :integer, description: 'Service radius in km' },
+              latitude: { type: :number, format: :float, description: 'Latitude' },
+              longitude: { type: :number, format: :float, description: 'Longitude' }
+              # Add other relevant attributes exposed by your RepairerSerializer
+            },
+            required: [ 'id', 'name', 'email_address' ] # Adjust required fields as needed
+          }
+        },
+        securitySchemes: {
+          Bearer: {
+            type: :http,
+            scheme: :bearer,
+            description: 'JWT token for authentication'
+          }
+        }
+      }
     }
   }
 

@@ -219,6 +219,60 @@ paths:
           description: booking not found
         '401':
           description: unauthorized
+  "/api/v1/profile":
+    get:
+      summary: Retrieves the current user profile
+      tags:
+      - Profile
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: JWT token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  email_address:
+                    type: string
+                    format: email
+                  address:
+                    type: string
+                  latitude:
+                    type: number
+                    format: float
+                    nullable: true
+                  longitude:
+                    type: number
+                    format: float
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                required:
+                - id
+                - name
+                - email_address
+                - address
+                - created_at
+                - updated_at
+        '401':
+          description: unauthorized - no token
   "/api/v1/repairers/{repairer_id}/calendar/{year}/{month}":
     parameters:
     - name: repairer_id
@@ -239,6 +293,12 @@ paths:
       required: true
       schema:
         type: integer
+    - name: Authorization
+      in: header
+      required: true
+      description: JWT token
+      schema:
+        type: string
     get:
       summary: Retrieves the monthly availability calendar for a repairer
       tags:
@@ -281,7 +341,55 @@ paths:
         '404':
           description: repairer not found
         '401':
-          description: token not provided
+          description: unauthorized - no token
+  "/api/v1/repairers/nearby":
+    parameters:
+    - name: latitude
+      in: query
+      format: float
+      required: true
+      description: User's latitude
+      schema:
+        type: number
+    - name: longitude
+      in: query
+      format: float
+      required: true
+      description: User's longitude
+      schema:
+        type: number
+    - name: radius
+      in: query
+      format: float
+      required: false
+      description: 'Search radius in kilometers (default: 10)'
+      schema:
+        type: number
+    - name: Authorization
+      in: header
+      required: true
+      description: JWT token
+      schema:
+        type: string
+    get:
+      summary: Finds repairers near a given location
+      tags:
+      - Repairers
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: successful - no repairers found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/repairer"
+        '400':
+          description: invalid radius
+        '401':
+          description: unauthorized - no token
   "/api/v1/sessions":
     post:
       summary: Creates a session (logs in)
@@ -425,3 +533,50 @@ servers:
   variables:
     defaultHost:
       default: www.example.com
+components:
+  schemas:
+    error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+      required:
+      - error
+    repairer:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Repairer ID
+        name:
+          type: string
+          description: Repairer name
+        email_address:
+          type: string
+          format: email
+          description: Repairer email
+        hourly_rate:
+          type: number
+          format: float
+          description: Hourly rate
+        service_radius:
+          type: integer
+          description: Service radius in km
+        latitude:
+          type: number
+          format: float
+          description: Latitude
+        longitude:
+          type: number
+          format: float
+          description: Longitude
+      required:
+      - id
+      - name
+      - email_address
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      description: JWT token for authentication

@@ -74,3 +74,5 @@ gem "rspec", "~> 3.13"
 gem "jwt", "~> 2.10"
 
 gem "annotate", "~> 2.6"
+
+gem "geocoder"
