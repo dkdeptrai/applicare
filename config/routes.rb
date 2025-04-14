@@ -12,11 +12,20 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :users, only: [ :show, :create ]
       resources :sessions, only: [ :create, :destroy ]
+      resources :repairer_sessions, only: [ :create ]
       resource :profile, only: [ :show ], controller: :profiles
       resources :bookings
       resources :repairers, only: [] do
-        get "calendar/:year/:month", to: "repairers#calendar", on: :member
-        get "nearby", on: :collection
+        member do
+          get "calendar/:year/:month", to: "repairers#calendar"
+          post "upload_profile_picture"
+          post "upload_work_image"
+          delete "delete_work_image"
+        end
+        collection do
+          get "nearby"
+        end
+        resources :reviews, only: [ :index, :create ]
       end
     end
   end

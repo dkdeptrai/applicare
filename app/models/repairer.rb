@@ -8,6 +8,7 @@ class Repairer < ApplicationRecord
   has_many :services, dependent: :destroy
   has_many :availabilities, dependent: :destroy
   has_many :bookings, foreign_key: :repairer_id, dependent: :destroy
+  has_many :reviews, dependent: :destroy
   has_many :appliances, through: :services
 
   validates :name, presence: true
@@ -16,6 +17,11 @@ class Repairer < ApplicationRecord
   validates :service_radius, presence: true, numericality: { greater_than: 0 }
 
   has_secure_password
+
+  def generate_jwt
+    # Ensure JwtToken class/module is available (e.g., require 'jwt_token' if needed)
+    JwtToken.encode({ repairer_id: id }, exp: 7.days.from_now)
+  end
 
   def available_time_slots(date)
     day_of_week = date.wday

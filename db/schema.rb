@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_13_145817) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_14_160424) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -69,7 +69,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_145817) do
     t.float "latitude"
     t.float "longitude"
     t.string "address", default: ""
+    t.boolean "professional"
+    t.integer "years_experience"
+    t.float "ratings_average"
+    t.integer "reviews_count"
+    t.integer "clients_count"
+    t.text "bio"
+    t.string "profile_picture_id"
+    t.jsonb "work_image_ids", default: [], null: false
     t.index ["email_address"], name: "index_repairers_on_email_address", unique: true
+  end
+
+  create_table "reviews", force: :cascade do |t|
+    t.integer "rating"
+    t.text "comment"
+    t.bigint "user_id", null: false
+    t.bigint "repairer_id", null: false
+    t.bigint "booking_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["booking_id"], name: "index_reviews_on_booking_id"
+    t.index ["repairer_id"], name: "index_reviews_on_repairer_id"
+    t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
   create_table "services", force: :cascade do |t|
@@ -111,6 +132,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_145817) do
   add_foreign_key "bookings", "repairers"
   add_foreign_key "bookings", "services"
   add_foreign_key "bookings", "users"
+  add_foreign_key "reviews", "bookings"
+  add_foreign_key "reviews", "repairers"
+  add_foreign_key "reviews", "users"
   add_foreign_key "services", "appliances"
   add_foreign_key "services", "repairers"
   add_foreign_key "sessions", "users"

@@ -76,3 +76,5 @@ gem "jwt", "~> 2.10"
 gem "annotate", "~> 2.6"
 
 gem "geocoder"
+
+gem "cloudinary", "~> 2.3"
