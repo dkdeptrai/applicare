@@ -10,10 +10,10 @@ Rails.application.routes.draw do
   # API routes
   namespace :api do
     namespace :v1 do
-      resources :users, only: [ :show, :create ]
+      resources :users, only: [ :show, :create, :update ]
       resources :sessions, only: [ :create, :destroy ]
       resources :repairer_sessions, only: [ :create ]
-      resource :profile, only: [ :show ], controller: :profiles
+      resource :profile, only: [ :show, :update ], controller: :profiles
       resources :bookings
       resources :repairers, only: [] do
         member do

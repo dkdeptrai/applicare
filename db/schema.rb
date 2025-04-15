@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_14_160424) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_15_081829) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -124,6 +124,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_14_160424) do
     t.float "latitude"
     t.float "longitude"
     t.string "address", default: ""
+    t.boolean "onboarded", default: false
+    t.date "date_of_birth"
+    t.string "mobile_number"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 

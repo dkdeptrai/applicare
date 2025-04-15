@@ -258,6 +258,15 @@ paths:
                     type: number
                     format: float
                     nullable: true
+                  date_of_birth:
+                    type: string
+                    format: date
+                    nullable: true
+                  mobile_number:
+                    type: string
+                    nullable: true
+                  onboarded:
+                    type: boolean
                   created_at:
                     type: string
                     format: date-time
@@ -269,10 +278,102 @@ paths:
                 - name
                 - email_address
                 - address
+                - onboarded
                 - created_at
                 - updated_at
         '401':
           description: unauthorized - no token
+    put:
+      summary: Updates the current user profile
+      tags:
+      - Profile
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: JWT token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  email_address:
+                    type: string
+                    format: email
+                  address:
+                    type: string
+                  date_of_birth:
+                    type: string
+                    format: date
+                    nullable: true
+                  mobile_number:
+                    type: string
+                    nullable: true
+                  latitude:
+                    type: number
+                    format: float
+                    nullable: true
+                  longitude:
+                    type: number
+                    format: float
+                    nullable: true
+                  onboarded:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                required:
+                - id
+                - name
+                - email_address
+                - address
+                - date_of_birth
+                - mobile_number
+                - onboarded
+        '401':
+          description: unauthorized
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    address:
+                      type: string
+                    date_of_birth:
+                      type: string
+                      format: date
+                    mobile_number:
+                      type: string
+                    latitude:
+                      type: number
+                      format: float
+                    longitude:
+                      type: number
+                      format: float
+              required:
+              - user
   "/api/v1/repairer_sessions":
     post:
       summary: Logs in a repairer
@@ -433,140 +534,6 @@ paths:
           description: invalid radius
         '401':
           description: unauthorized - no token
-  "/api/v1/repairers/{repairer_id}/reviews":
-    parameters:
-    - name: repairer_id
-      in: path
-      description: ID of the repairer
-      required: true
-      schema:
-        type: string
-    get:
-      summary: list reviews for a repairer
-      tags:
-      - Reviews
-      parameters:
-      - name: repairer_id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: successful
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    rating:
-                      type: integer
-                    comment:
-                      type: string
-                    user:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        name:
-                          type: string
-                      required:
-                      - id
-                      - name
-                    created_at:
-                      type: string
-                      format: date_time
-                    updated_at:
-                      type: string
-                      format: date_time
-                  required:
-                  - id
-                  - rating
-                  - comment
-                  - user
-                  - created_at
-                  - updated_at
-        '404':
-          description: repairer not found
-    post:
-      summary: create review for a repairer
-      tags:
-      - Reviews
-      security:
-      - Bearer: {}
-      parameters:
-      - name: repairer_id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '201':
-          description: review created
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  rating:
-                    type: integer
-                  comment:
-                    type: string
-                  user_id:
-                    type: integer
-                  repairer_id:
-                    type: integer
-                  booking_id:
-                    type: integer
-                  created_at:
-                    type: string
-                    format: date_time
-                  updated_at:
-                    type: string
-                    format: date_time
-                required:
-                - id
-                - rating
-                - comment
-                - user_id
-                - repairer_id
-                - booking_id
-                - created_at
-                - updated_at
-        '401':
-          description: unauthorized
-        '422':
-          description: unprocessable entity
-        '404':
-          description: repairer not found
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                review:
-                  type: object
-                  properties:
-                    rating:
-                      type: integer
-                      description: Rating from 1 to 5
-                      example: 5
-                    comment:
-                      type: string
-                      description: Review comment
-                      example: Great service!
-                  required:
-                  - rating
-                  - comment
-              required:
-              - review
   "/api/v1/sessions":
     post:
       summary: Creates a session (logs in)
@@ -658,6 +625,25 @@ paths:
                     type: string
                   email_address:
                     type: string
+                  address:
+                    type: string
+                  date_of_birth:
+                    type: string
+                    format: date
+                    nullable: true
+                  mobile_number:
+                    type: string
+                    nullable: true
+                  latitude:
+                    type: number
+                    format: float
+                    nullable: true
+                  longitude:
+                    type: number
+                    format: float
+                    nullable: true
+                  onboarded:
+                    type: boolean
                   created_at:
                     type: string
                     format: date-time
@@ -668,10 +654,63 @@ paths:
                 - id
                 - name
                 - email_address
+                - onboarded
         '404':
           description: user not found
         '401':
           description: unauthorized
+    put:
+      summary: Updates a user
+      tags:
+      - Users
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: JWT token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: user updated
+        '403':
+          description: forbidden - cannot update another user
+        '401':
+          description: unauthorized
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    address:
+                      type: string
+                    date_of_birth:
+                      type: string
+                      format: date
+                    mobile_number:
+                      type: string
+                    latitude:
+                      type: number
+                      format: float
+                    longitude:
+                      type: number
+                      format: float
+              required:
+              - user
   "/api/v1/users":
     post:
       summary: Creates a user

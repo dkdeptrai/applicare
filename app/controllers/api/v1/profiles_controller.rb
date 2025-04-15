@@ -11,6 +11,30 @@ module Api
           render json: { error: "Not authenticated" }, status: :unauthorized
         end
       end
+
+      # PUT/PATCH /api/v1/profile
+      def update
+        if @current_user.update(profile_params)
+          # Check if this is an onboarding update
+          if onboarding_complete?(profile_params) && !@current_user.onboarded
+            @current_user.update(onboarded: true)
+          end
+
+          render json: @current_user, serializer: UserSerializer
+        else
+          render json: { errors: @current_user.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+
+      private
+
+      def profile_params
+        params.require(:user).permit(:name, :address, :date_of_birth, :mobile_number, :latitude, :longitude)
+      end
+
+      def onboarding_complete?(params)
+        params[:date_of_birth].present? && params[:mobile_number].present? && params[:address].present?
+      end
     end
   end
 end
