@@ -9,10 +9,6 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
-FactoryBot.define do
-  factory :appliance do
-    name { Faker::Appliance.equipment }
-    brand { Faker::Appliance.brand }
-    model { "#{Faker::Alphanumeric.alphanumeric(number: 2).upcase}#{Faker::Number.number(digits: 4)}" }
-  end
+class ApplianceSerializer < ActiveModel::Serializer
+  attributes :id, :name, :brand, :model, :created_at, :updated_at
 end

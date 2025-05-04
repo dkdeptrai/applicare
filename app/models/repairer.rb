@@ -1,3 +1,31 @@
+# == Schema Information
+#
+# Table name: repairers
+#
+#  id                 :bigint           not null, primary key
+#  address            :string           default("")
+#  bio                :text
+#  clients_count      :integer
+#  email_address      :string           not null
+#  hourly_rate        :decimal(, )
+#  latitude           :float
+#  longitude          :float
+#  name               :string           not null
+#  password_digest    :string           not null
+#  professional       :boolean
+#  ratings_average    :float
+#  reviews_count      :integer
+#  service_radius     :integer
+#  work_image_ids     :jsonb            not null
+#  years_experience   :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  profile_picture_id :string
+#
+# Indexes
+#
+#  index_repairers_on_email_address  (email_address) UNIQUE
+#
 class Repairer < ApplicationRecord
   geocoded_by :address # if you have an address field to geocode from
   # If you only store lat/lon and don't geocode from address, you might not need geocoded_by
@@ -10,6 +38,7 @@ class Repairer < ApplicationRecord
   has_many :bookings, foreign_key: :repairer_id, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :appliances, through: :services
+  has_many :messages, as: :sender, dependent: :destroy
 
   validates :name, presence: true
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }

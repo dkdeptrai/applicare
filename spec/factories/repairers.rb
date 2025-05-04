@@ -1,3 +1,31 @@
+# == Schema Information
+#
+# Table name: repairers
+#
+#  id                 :bigint           not null, primary key
+#  address            :string           default("")
+#  bio                :text
+#  clients_count      :integer
+#  email_address      :string           not null
+#  hourly_rate        :decimal(, )
+#  latitude           :float
+#  longitude          :float
+#  name               :string           not null
+#  password_digest    :string           not null
+#  professional       :boolean
+#  ratings_average    :float
+#  reviews_count      :integer
+#  service_radius     :integer
+#  work_image_ids     :jsonb            not null
+#  years_experience   :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  profile_picture_id :string
+#
+# Indexes
+#
+#  index_repairers_on_email_address  (email_address) UNIQUE
+#
 FactoryBot.define do
   factory :repairer do
     name { Faker::Name.name }

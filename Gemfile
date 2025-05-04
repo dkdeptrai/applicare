@@ -63,7 +63,6 @@ group :development do
   gem "web-console"
 end
 
-
 gem "tailwindcss-rails", "~> 4.2"
 gem "tailwindcss-ruby", "~> 4.0"
 
@@ -73,8 +72,11 @@ gem "rspec", "~> 3.13"
 
 gem "jwt", "~> 2.10"
 
-gem "annotate", "~> 2.6"
 
 gem "geocoder"
 
 gem "cloudinary", "~> 2.3"
+
+gem "activesupport", "~> 8.0"
+
+gem "annotaterb", "~> 4.14"
