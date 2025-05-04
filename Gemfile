@@ -64,7 +64,7 @@ group :development do
 end
 
 gem "tailwindcss-rails", "~> 4.2"
-gem "tailwindcss-ruby", "~> 4.0"
+gem "tailwindcss-ruby", "~> 4.1"
 
 gem "rswag", "~> 2.16"
 
