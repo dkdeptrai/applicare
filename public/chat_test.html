@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Test</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/actioncable@5.2.8/lib/assets/compiled/action_cable.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .chat-container {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      height: 400px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    
+    .message {
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      max-width: 80%;
+    }
+    
+    .message-user {
+      background-color: #e3f2fd;
+      margin-left: auto;
+      text-align: right;
+    }
+    
+    .message-repairer {
+      background-color: #f5f5f5;
+    }
+    
+    .message-info {
+      font-size: 0.8em;
+      color: #666;
+    }
+    
+    .message-content {
+      margin-top: 5px;
+    }
+    
+    .input-container {
+      display: flex;
+    }
+    
+    .input-container input {
+      flex-grow: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+    
+    .input-container button {
+      padding: 8px 16px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    .input-container button:hover {
+      background-color: #45a049;
+    }
+    
+    .connection-status {
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 5px;
+    }
+    
+    .connected {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .disconnected {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+    
+    .login-form {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .login-form div {
+      margin-bottom: 10px;
+    }
+    
+    .login-form label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    .login-form input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    
+    .login-form button {
+      padding: 8px 16px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    .login-form button:hover {
+      background-color: #1e88e5;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chat Test</h1>
+  
+  <div class="login-form" id="login-form">
+    <h2>Login</h2>
+    <div>
+      <label for="email">Email:</label>
+      <input type="email" id="email" placeholder="Enter your email">
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" placeholder="Enter your password">
+    </div>
+    <div>
+      <button id="login-button">Login</button>
+    </div>
+  </div>
+  
+  <div class="booking-form" id="booking-form" style="display: none;">
+    <h2>Select Booking</h2>
+    <div>
+      <label for="booking-id">Booking ID:</label>
+      <input type="number" id="booking-id" placeholder="Enter booking ID">
+    </div>
+    <div>
+      <button id="connect-button">Connect to Chat</button>
+    </div>
+  </div>
+  
+  <div class="chat" id="chat" style="display: none;">
+    <div class="connection-status" id="connection-status">
+      Not connected
+    </div>
+    
+    <div class="chat-container" id="messages">
+      <!-- Messages will be displayed here -->
+    </div>
+    
+    <div class="input-container">
+      <input type="text" id="message-input" placeholder="Type your message...">
+      <button id="send-button">Send</button>
+    </div>
+  </div>
+  
+  <script>
+    // Chat functionality
+    let consumer = null;
+    let channel = null;
+    let token = null;
+    let currentUser = null;
+    let currentBookingId = null;
+    
+    // DOM Elements
+    const loginForm = document.getElementById('login-form');
+    const bookingForm = document.getElementById('booking-form');
+    const chat = document.getElementById('chat');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginButton = document.getElementById('login-button');
+    const bookingIdInput = document.getElementById('booking-id');
+    const connectButton = document.getElementById('connect-button');
+    const connectionStatus = document.getElementById('connection-status');
+    const messagesContainer = document.getElementById('messages');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    
+    // Login function
+    loginButton.addEventListener('click', () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      
+      if (!email || !password) {
+        alert('Please enter email and password');
+        return;
+      }
+      
+      fetch('/api/v1/sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email_address: email,
+          password: password
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.token) {
+          token = data.token;
+          currentUser = data.user;
+          
+          // Save token to localStorage
+          localStorage.setItem('jwt_token', token);
+          
+          // Hide login form, show booking form
+          loginForm.style.display = 'none';
+          bookingForm.style.display = 'block';
+          
+          console.log('Logged in as:', currentUser);
+        } else {
+          alert('Login failed: ' + (data.error || 'Unknown error'));
+        }
+      })
+      .catch(error => {
+        console.error('Login error:', error);
+        alert('Login failed: ' + error.message);
+      });
+    });
+    
+    // Connect to chat
+    connectButton.addEventListener('click', () => {
+      const bookingId = bookingIdInput.value;
+      
+      if (!bookingId) {
+        alert('Please enter a booking ID');
+        return;
+      }
+      
+      currentBookingId = bookingId;
+      
+      // Load previous messages
+      loadMessages(bookingId);
+      
+      // Connect to ActionCable
+      consumer = ActionCable.createConsumer(`/api/v1/cable?token=${token}`);
+      channel = consumer.subscriptions.create(
+        { channel: 'ChatChannel', booking_id: bookingId },
+        {
+          connected() {
+            console.log('Connected to ChatChannel');
+            connectionStatus.textContent = 'Connected';
+            connectionStatus.classList.add('connected');
+            connectionStatus.classList.remove('disconnected');
+            
+            // Hide booking form, show chat
+            bookingForm.style.display = 'none';
+            chat.style.display = 'block';
+          },
+          
+          disconnected() {
+            console.log('Disconnected from ChatChannel');
+            connectionStatus.textContent = 'Disconnected';
+            connectionStatus.classList.add('disconnected');
+            connectionStatus.classList.remove('connected');
+          },
+          
+          received(data) {
+            console.log('Received message:', data);
+            addMessage(data);
+          }
+        }
+      );
+    });
+    
+    // Send message
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', event => {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    });
+    
+    function sendMessage() {
+      const content = messageInput.value.trim();
+      
+      if (!content) {
+        return;
+      }
+      
+      if (channel) {
+        // Send through ActionCable
+        channel.send({ content: content });
+      } else {
+        // Fallback to REST API
+        fetch('/api/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            message: { content: content },
+            booking_id: currentBookingId
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Message sent:', data);
+        })
+        .catch(error => {
+          console.error('Error sending message:', error);
+          alert('Failed to send message: ' + error.message);
+        });
+      }
+      
+      // Clear input
+      messageInput.value = '';
+    }
+    
+    function loadMessages(bookingId) {
+      fetch(`/api/v1/bookings/${bookingId}/messages`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Clear existing messages
+        messagesContainer.innerHTML = '';
+        
+        // Add messages
+        data.forEach(message => {
+          addMessage(message);
+        });
+        
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      })
+      .catch(error => {
+        console.error('Error loading messages:', error);
+        alert('Failed to load messages: ' + error.message);
+      });
+    }
+    
+    function addMessage(message) {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+      
+      // Check if message is from current user
+      const isFromCurrentUser = message.sender_type === 'User' && 
+                               message.sender_id === currentUser.id;
+      
+      messageElement.classList.add(isFromCurrentUser ? 'message-user' : 'message-repairer');
+      
+      // Create message info element
+      const infoElement = document.createElement('div');
+      infoElement.classList.add('message-info');
+      infoElement.textContent = isFromCurrentUser ? 'You' : 'Repairer';
+      
+      if (message.created_at) {
+        const date = new Date(message.created_at);
+        infoElement.textContent += ` · ${date.toLocaleTimeString()}`;
+      }
+      
+      // Create message content element
+      const contentElement = document.createElement('div');
+      contentElement.classList.add('message-content');
+      contentElement.textContent = message.content;
+      
+      // Append elements
+      messageElement.appendChild(infoElement);
+      messageElement.appendChild(contentElement);
+      messagesContainer.appendChild(messageElement);
+      
+      // Scroll to bottom
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Check if already logged in
+    const savedToken = localStorage.getItem('jwt_token');
+    if (savedToken) {
+      // Validate token
+      fetch('/api/v1/profile', {
+        headers: {
+          'Authorization': `Bearer ${savedToken}`
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          // Invalid token, remove from localStorage
+          localStorage.removeItem('jwt_token');
+          throw new Error('Invalid token');
+        }
+      })
+      .then(data => {
+        // Token is valid, set current user and token
+        token = savedToken;
+        currentUser = data;
+        
+        // Hide login form, show booking form
+        loginForm.style.display = 'none';
+        bookingForm.style.display = 'block';
+        
+        console.log('Logged in as:', currentUser);
+      })
+      .catch(error => {
+        console.error('Token validation error:', error);
+      });
+    }
+  </script>
+</body>
+</html> 

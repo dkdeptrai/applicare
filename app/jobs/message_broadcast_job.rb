@@ -8,7 +8,8 @@ class MessageBroadcastJob < ApplicationJob
       sender_type: message.sender_type,
       sender_id: message.sender_id,
       sender_name: message.sender.name,
-      created_at: message.created_at
+      created_at: message.created_at,
+      booking_id: message.booking_id
     })
   end
 end

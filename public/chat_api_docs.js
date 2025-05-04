@@ -64,7 +64,7 @@ function createChatClient(bookingId, jwtToken) {
     // Handle confirmation
     if (data.type === "confirm_subscription") {
       // Load message history through REST API
-      fetch(`/api/bookings/${bookingId}/messages`, {
+      fetch(`/api/v1/bookings/${bookingId}/messages`, {
         headers: {
           Authorization: `Bearer ${jwtToken}`,
           "Content-Type": "application/json",
@@ -89,6 +89,7 @@ function createChatClient(bookingId, jwtToken) {
   return {
     // Send a message
     sendMessage: (content) => {
+      // Use the Action Cable channel for sending
       socket.send(
         JSON.stringify({
           command: "message",
@@ -101,6 +102,21 @@ function createChatClient(bookingId, jwtToken) {
           }),
         })
       );
+
+      // Alternatively, you can use the REST API
+      /*
+      fetch('/api/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${jwtToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: { content },
+          booking_id: bookingId
+        })
+      });
+      */
     },
 
     // Get all messages

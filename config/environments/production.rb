@@ -87,4 +87,14 @@ Rails.application.configure do
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  # ActionCable configuration
+  # config.action_cable.allowed_request_origins = [
+  #   # Update these with your actual production domains
+  #   "https://example.com",
+  #   "https://www.example.com"
+  # ]
+  config.action_cable.disable_request_forgery_protection = true
+  # Use Redis as the ActionCable backend in production
+  config.action_cable.url = "wss://example.com/api/v1/cable"
 end

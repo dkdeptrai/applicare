@@ -20,7 +20,7 @@
 #  fk_rails_...  (booking_id => bookings.id)
 #
 class MessageSerializer < ActiveModel::Serializer
-  attributes :id, :content, :created_at, :sender_type, :sender_id, :sender_info
+  attributes :id, :content, :created_at, :sender_type, :sender_id, :sender_info, :booking_id
 
   def sender_info
     {

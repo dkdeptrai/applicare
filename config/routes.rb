@@ -9,18 +9,27 @@ Rails.application.routes.draw do
 
   # API routes
   namespace :api do
-    resources :messages, only: [ :create ]
-    resources :bookings, only: [] do
-      resources :messages, only: [ :index ]
-    end
-
     namespace :v1 do
+      # Mount ActionCable server at /api/v1/cable
+      mount ActionCable.server => "/cable"
+
       resources :users, only: [ :show, :create, :update ]
       resources :sessions, only: [ :create, :destroy ]
       resources :repairer_sessions, only: [ :create ]
       resource :profile, only: [ :show, :update ], controller: :profiles
       resources :bookings
-      resources :appliances
+      resources :appliances do
+        member do
+          get :bookings
+        end
+        collection do
+          get :my_appliances
+        end
+      end
+      resources :messages, only: [ :create ]
+      resources :bookings, only: [] do
+        resources :messages, only: [ :index ]
+      end
       resources :repairers, only: [] do
         member do
           get "calendar/:year/:month", to: "repairers#calendar"

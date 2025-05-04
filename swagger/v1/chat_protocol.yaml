@@ -6,7 +6,12 @@ info:
 
     This document provides information about the WebSocket-based chat system.
 
-    ## Connection
+    ## REST API Endpoints
+
+    - GET `/api/v1/bookings/{booking_id}/messages` - Get message history for a booking
+    - POST `/api/v1/messages` with `{ "message": { "content": "..." }, "booking_id": 123 }` - Send a message
+
+    ## WebSocket Connection
     Connect to the WebSocket endpoint with the following parameters:
 
     ```
@@ -92,3 +97,6 @@ components:
           type: string
           format: date-time
           description: Timestamp when the message was created
+        booking_id:
+          type: integer
+          description: ID of the booking associated with this message

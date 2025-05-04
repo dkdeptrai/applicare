@@ -4,6 +4,7 @@
 #
 #  id         :bigint           not null, primary key
 #  brand      :string           not null
+#  image_url  :string
 #  model      :string           not null
 #  name       :string           not null
 #  created_at :datetime         not null

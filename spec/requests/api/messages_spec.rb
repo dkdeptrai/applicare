@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'swagger_helper'
 
-RSpec.describe Api::MessagesController, type: :request do
+RSpec.describe Api::V1::MessagesController, type: :request do
   include Rails.application.routes.url_helpers
 
   # Test data setup
@@ -13,7 +13,7 @@ RSpec.describe Api::MessagesController, type: :request do
   let(:user_headers) { { 'Authorization' => "Bearer #{user.generate_jwt}" } }
   let(:repairer_headers) { { 'Authorization' => "Bearer #{repairer.generate_jwt}" } }
 
-  path '/api/bookings/{booking_id}/messages' do
+  path '/api/v1/bookings/{booking_id}/messages' do
     parameter name: :booking_id, in: :path, type: :integer, description: 'ID of the booking'
 
     get 'Retrieves all messages for a booking' do
@@ -31,6 +31,7 @@ RSpec.describe Api::MessagesController, type: :request do
                    created_at: { type: :string, format: 'date-time' },
                    sender_type: { type: :string },
                    sender_id: { type: :integer },
+                   booking_id: { type: :integer },
                    sender_info: {
                      type: :object,
                      properties: {
@@ -40,7 +41,7 @@ RSpec.describe Api::MessagesController, type: :request do
                      }
                    }
                  },
-                 required: %w[id content created_at sender_type sender_id]
+                 required: %w[id content created_at sender_type sender_id booking_id]
                }
 
         let(:booking_id) { booking.id }
@@ -70,7 +71,7 @@ RSpec.describe Api::MessagesController, type: :request do
     end
   end
 
-  path '/api/messages' do
+  path '/api/v1/messages' do
     post 'Creates a new message' do
       tags 'Chat'
       consumes 'application/json'

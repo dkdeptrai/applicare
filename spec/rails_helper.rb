@@ -10,6 +10,8 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'rspec/rails'
 require 'cloudinary'
 # Add additional requires below this line. Rails is not loaded until this point!
+require 'capybara/rspec'
+require 'capybara/rails'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -81,6 +83,23 @@ RSpec.configure do |config|
       c.api_secret = 'test-secret'
       c.secure = true
     end
+  end
+
+  # Configure Capybara for feature specs
+  config.include Warden::Test::Helpers
+
+  # Configure system tests
+  config.before(:each, type: :system) do
+    driven_by :selenium_chrome_headless
+  end
+
+  config.before(:each, type: :feature) do
+    driven_by :selenium_chrome_headless
+  end
+
+  # Clean up Warden after each test
+  config.after(:each, type: :feature) do
+    Warden.test_reset!
   end
 end
 
