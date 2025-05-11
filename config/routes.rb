@@ -42,6 +42,15 @@ Rails.application.routes.draw do
         end
         resources :reviews, only: [ :index, :create ]
       end
+
+      # Repairer bookings routes
+      namespace :repairer do
+        resources :bookings, only: [ :index, :show, :update ] do
+          member do
+            post :notes
+          end
+        end
+      end
     end
   end
 

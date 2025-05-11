@@ -8,7 +8,7 @@ module Api
       end
 
       def create
-        repairer = Repairer.find_by(email_address: params[:email_address]&.downcase)
+        repairer = ::Repairer.find_by(email_address: params[:email_address]&.downcase)
 
         if repairer&.authenticate(params[:password])
           token = repairer.generate_jwt

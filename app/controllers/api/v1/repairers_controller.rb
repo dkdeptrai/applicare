@@ -15,7 +15,7 @@ module Api
       # REMOVED :authorize_repairer!
 
       def index
-        @repairers = Repairer.all
+        @repairers = ::Repairer.all
         render json: @repairers, each_serializer: RepairerSerializer
       end
 
@@ -82,7 +82,7 @@ module Api
           return
         end
 
-        @repairers = Repairer.near([ lat_f, lon_f ], radius, units: :km)
+        @repairers = ::Repairer.near([ lat_f, lon_f ], radius, units: :km)
         render json: @repairers, each_serializer: RepairerSerializer
       end
 
@@ -192,7 +192,7 @@ module Api
 
       # Renamed original set_repairer for clarity
       def set_repairer_public
-        @repairer = Repairer.find(params[:id])
+        @repairer = ::Repairer.find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: "Repairer not found" }, status: :not_found
       end
@@ -210,7 +210,7 @@ module Api
         # Find the repairer by ID but *only if* it matches the authenticated repairer
         # Ensure we use integer ID for lookup
         target_id = id_param.to_i
-        repairer = Repairer.find_by(id: target_id)
+        repairer = ::Repairer.find_by(id: target_id)
 
         # Explicitly compare integer IDs for robustness
         if repairer && @current_repairer && repairer.id == @current_repairer.id

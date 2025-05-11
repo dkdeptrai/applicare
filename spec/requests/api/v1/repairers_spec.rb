@@ -276,16 +276,13 @@ RSpec.describe 'Api::V1::Repairers', type: :request do
 
           # Keep the 'Cloudinary upload error' response definition for docs
           response(500, 'Cloudinary upload error') do
-            # Remove before block with mocks
-            # before do
-            #   # Override the success stub for upload
-            #   allow(Cloudinary::Uploader).to receive(:upload).and_raise(Cloudinary::CloudinaryException, "Upload failed")
-            # end
-            # Remove test execution lets and run_test!
-            # let(:'Authorization') { repairer_auth_headers['Authorization'] } # Same valid auth
-            # let(:id) { repairer_id }
-            # let(:image) { nil }
-            # run_test!
+            # Update to mark as pending
+            before do
+              pending "Skipping test for Cloudinary error handling"
+              allow(Cloudinary::Uploader).to receive(:upload).and_raise(Cloudinary::CloudinaryException, "Upload failed")
+            end
+
+            run_test!
           end
         end # End context 'for documentation: authentication valid examples'
 
@@ -376,15 +373,13 @@ RSpec.describe 'Api::V1::Repairers', type: :request do
           end
 
           response(500, 'Cloudinary upload error') do
-            # Remove before block
-            # before do
-            #   allow(Cloudinary::Uploader).to receive(:upload).and_raise(Cloudinary::CloudinaryException, "Upload failed")
-            # end
-            # Remove test execution
-            # let(:'Authorization') { repairer_auth_headers['Authorization'] }
-            # let(:id) { repairer_id }
-            # let(:image) { nil }
-            # run_test!
+            # Update to mark as pending
+            before do
+              pending "Skipping test for Cloudinary error handling"
+              allow(Cloudinary::Uploader).to receive(:upload).and_raise(Cloudinary::CloudinaryException, "Upload failed")
+            end
+
+            run_test!
           end
         end # End context 'for documentation: authentication valid examples'
 
@@ -475,15 +470,13 @@ RSpec.describe 'Api::V1::Repairers', type: :request do
         end
 
         response(500, 'Cloudinary delete error') do
-          # Remove before block
-          # before do
-          #   allow(Cloudinary::Uploader).to receive(:destroy).and_raise(Cloudinary::CloudinaryException, "Delete failed")
-          # end
-          # Remove test execution
-          # let(:'Authorization') { repairer_auth_headers['Authorization'] }
-          # let(:id) { repairer_id }
-          # let(:image_id) { 'old_work_pic_1' }
-          # run_test!
+          # Update to mark as pending
+          before do
+            pending "Skipping test for Cloudinary error handling"
+            allow(Cloudinary::Uploader).to receive(:destroy).and_raise(Cloudinary::CloudinaryException, "Delete failed")
+          end
+
+          run_test!
         end
       end # End context 'for documentation: authentication valid examples'
 

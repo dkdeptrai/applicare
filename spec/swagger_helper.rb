@@ -54,6 +54,28 @@ RSpec.configure do |config|
               # Add other relevant attributes exposed by your RepairerSerializer
             },
             required: [ 'id', 'name', 'email_address' ] # Adjust required fields as needed
+          },
+          booking: {
+            type: :object,
+            properties: {
+              id: { type: :integer, description: 'Booking ID' },
+              repairer_id: { type: :integer, description: 'Repairer ID' },
+              user_id: { type: :integer, description: 'User ID' },
+              service_id: { type: :integer, description: 'Service ID' },
+              start_time: { type: :string, format: 'date-time', description: 'Start time of booking' },
+              end_time: { type: :string, format: 'date-time', description: 'End time of booking' },
+              status: {
+                type: :string,
+                enum: [ 'pending', 'confirmed', 'completed', 'cancelled' ],
+                description: 'Booking status'
+              },
+              address: { type: :string, description: 'Service address' },
+              notes: { type: :string, nullable: true, description: 'Customer notes' },
+              repairer_note: { type: :string, nullable: true, description: 'Repairer notes' },
+              created_at: { type: :string, format: 'date-time', description: 'Creation timestamp' },
+              updated_at: { type: :string, format: 'date-time', description: 'Last update timestamp' }
+            },
+            required: %w[id repairer_id user_id service_id start_time end_time status address]
           }
         },
         securitySchemes: {
