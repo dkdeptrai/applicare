@@ -11,19 +11,33 @@ module JwtAuthenticable
     token = request.headers["Authorization"]&.split(" ")&.last
 
     if token.present?
-      decoded_token = JwtToken.decode(token)
-      if decoded_token.present?
-        if decoded_token[:user_id].present?
-          @current_user = User.find_by(id: decoded_token[:user_id])
-          return if @current_user
-        elsif decoded_token[:repairer_id].present?
-          @current_repairer = Repairer.find_by(id: decoded_token[:repairer_id])
-          return if @current_repairer
+      begin
+        decoded_token = JwtToken.decode(token)
+        if decoded_token.present?
+          if decoded_token[:user_id].present?
+            @current_user = User.find_by(id: decoded_token[:user_id])
+            return if @current_user
+          elsif decoded_token[:repairer_id].present?
+            @current_repairer = Repairer.find_by(id: decoded_token[:repairer_id])
+            return if @current_repairer
+          end
         end
+        render json: { error: "Unauthorized" }, status: :unauthorized
+      rescue JWT::ExpiredSignature
+        render json: {
+          error: "Unauthorized",
+          code: "token_expired",
+          message: "Your session has expired. Please refresh your token or login again."
+        }, status: :unauthorized
+      rescue JWT::DecodeError => e
+        render json: {
+          error: "Unauthorized",
+          code: "invalid_token",
+          message: "Authentication failed due to an invalid token."
+        }, status: :unauthorized
       end
-      render json: { error: "Unauthorized" }, status: :unauthorized
     else
-      render json: { error: "Token not provided" }, status: :unauthorized
+      render json: { error: "Unauthorized", message: "Token not provided" }, status: :unauthorized
     end
   end
 

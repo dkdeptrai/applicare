@@ -11,18 +11,22 @@ module Api
         repairer = ::Repairer.find_by(email_address: params[:email_address]&.downcase)
 
         if repairer&.authenticate(params[:password])
-          token = repairer.generate_jwt
-          render json: { token: token, repairer: RepairerSerializer.new(repairer).as_json }, status: :created # Return token and basic repairer info
+          token_response = repairer.generate_token_pair
+          render json: token_response.merge(repairer: RepairerSerializer.new(repairer).as_json), status: :created
         else
           render json: { error: "Invalid email or password" }, status: :unauthorized
         end
       end
 
-      # Add a destroy action if you want repairers to be able to "log out" (invalidate tokens server-side is complex with JWT)
-      # def destroy
-      #   # Typically JWT logout is handled client-side by deleting the token
-      #   head :no_content
-      # end
+      def destroy
+        # Invalidate refresh tokens on logout
+        if current_repairer
+          current_repairer.refresh_tokens.active.update_all(used: true)
+          render json: { message: "Successfully logged out" }
+        else
+          render json: { error: "Not authenticated" }, status: :unauthorized
+        end
+      end
     end
   end
 end

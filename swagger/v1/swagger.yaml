@@ -934,30 +934,43 @@ paths:
               - note
   "/api/v1/repairer_sessions":
     post:
-      summary: Logs in a repairer
+      summary: Creates a repairer session (logs in)
       tags:
       - Repairer Authentication
       parameters: []
       responses:
         '201':
-          description: login successful
+          description: repairer logged in
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  token:
+                  access_token:
                     type: string
-                    description: JWT authentication token
+                  refresh_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
                   repairer:
-                    "$ref": "#/components/schemas/repairer"
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      email_address:
+                        type: string
                 required:
-                - token
+                - access_token
+                - refresh_token
+                - token_type
+                - expires_in
                 - repairer
         '401':
-          description: invalid credentials - wrong email
-        '400':
-          description: missing parameters
+          description: unauthorized - invalid credentials
       requestBody:
         content:
           application/json:
@@ -966,15 +979,34 @@ paths:
               properties:
                 email_address:
                   type: string
-                  format: email
-                  example: repairer@example.com
                 password:
                   type: string
-                  format: password
-                  example: password123
               required:
               - email_address
               - password
+  "/api/v1/repairer_sessions/{id}":
+    delete:
+      summary: Destroys a repairer session (logs out)
+      tags:
+      - Repairer Authentication
+      parameters:
+      - name: id
+        in: path
+        description: ID is optional
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: JWT token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: repairer logged out
+        '401':
+          description: unauthorized
   "/api/v1/repairers/{repairer_id}/calendar/{year}/{month}":
     parameters:
     - name: repairer_id
@@ -1187,12 +1219,21 @@ paths:
               schema:
                 type: object
                 properties:
-                  token:
+                  access_token:
                     type: string
+                  refresh_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
                   user_id:
                     type: integer
                 required:
-                - token
+                - access_token
+                - refresh_token
+                - token_type
+                - expires_in
                 - user_id
         '401':
           description: unauthorized - invalid credentials
@@ -1232,6 +1273,65 @@ paths:
           description: user logged out
         '401':
           description: unauthorized
+  "/api/v1/token/refresh":
+    post:
+      summary: Refresh access token
+      tags:
+      - Authentication
+      parameters: []
+      responses:
+        '200':
+          description: token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
+                required:
+                - access_token
+                - refresh_token
+                - token_type
+                - expires_in
+        '400':
+          description: bad request - refresh token not provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                - error
+        '401':
+          description: unauthorized - invalid refresh token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+              required:
+              - refresh_token
   "/api/v1/users/{id}":
     get:
       summary: Retrieves a user

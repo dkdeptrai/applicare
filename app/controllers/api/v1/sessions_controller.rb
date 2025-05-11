@@ -6,16 +6,21 @@ module Api
       def create
         user = User.find_by(email_address: params[:email_address])
         if user&.authenticate(params[:password])
-          token = user.generate_jwt
-          render json: { token: token, user_id: user.id }
+          token_response = user.generate_token_pair
+          render json: token_response.merge(user_id: user.id), status: :ok
         else
           render json: { error: "Invalid email or password" }, status: :unauthorized
         end
       end
 
       def destroy
-        # If using token revocation or blacklisting, implement here
-        render json: { message: "Successfully logged out" }
+        # If you want to invalidate refresh tokens on logout
+        if current_user
+          current_user.refresh_tokens.active.update_all(used: true)
+          render json: { message: "Successfully logged out" }
+        else
+          render json: { error: "Not authenticated" }, status: :unauthorized
+        end
       end
     end
   end

@@ -3,6 +3,7 @@ require 'swagger_helper'
 RSpec.describe 'Users API', type: :request do
   let(:test_user) { create(:user) }
   let(:token) { JwtToken.encode({ user_id: test_user.id }, exp: 7.days.from_now) }
+  let(:Authorization) { "Bearer #{token}" }
 
   path '/api/v1/users/{id}' do
     get 'Retrieves a user' do
@@ -29,19 +30,17 @@ RSpec.describe 'Users API', type: :request do
                required: %w[id name email_address onboarded]
 
         let(:id) { test_user.id }
-        let(:'Authorization') { "Bearer #{token}" }
         run_test!
       end
 
       response '404', 'user not found' do
         let(:id) { 'invalid' }
-        let(:'Authorization') { "Bearer #{token}" }
         run_test!
       end
 
       response '401', 'unauthorized' do
         let(:id) { test_user.id }
-        let(:'Authorization') { "Bearer invalid_token" }
+        let(:Authorization) { "Bearer invalid_token" }
 
         run_test! do
           expect(response.status).to eq 401
@@ -76,7 +75,6 @@ RSpec.describe 'Users API', type: :request do
 
       response '200', 'user updated' do
         let(:id) { test_user.id }
-        let(:'Authorization') { "Bearer #{token}" }
         let(:user) do
           {
             user: {
@@ -114,7 +112,6 @@ RSpec.describe 'Users API', type: :request do
       response '403', 'forbidden - cannot update another user' do
         let(:another_user) { create(:user) }
         let(:id) { another_user.id }
-        let(:'Authorization') { "Bearer #{token}" }
         let(:user) { { user: { name: 'Updated Name' } } }
 
         run_test! do |response|
@@ -126,14 +123,13 @@ RSpec.describe 'Users API', type: :request do
 
       response '401', 'unauthorized' do
         let(:id) { test_user.id }
-        let(:'Authorization') { "Bearer invalid_token" }
+        let(:Authorization) { "Bearer invalid_token" }
         let(:user) { { user: { name: 'Updated Name' } } }
         run_test!
       end
 
       response '422', 'invalid request' do
         let(:id) { test_user.id }
-        let(:'Authorization') { "Bearer #{token}" }
         let(:user) { { user: { name: '' } } } # Empty name should fail validation
 
         run_test! do |response|

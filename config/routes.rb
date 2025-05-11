@@ -13,9 +13,14 @@ Rails.application.routes.draw do
       # Mount ActionCable server at /api/v1/cable
       mount ActionCable.server => "/cable"
 
+      # Authentication routes
       resources :users, only: [ :show, :create, :update ]
       resources :sessions, only: [ :create, :destroy ]
-      resources :repairer_sessions, only: [ :create ]
+      resources :repairer_sessions, only: [ :create, :destroy ]
+
+      # Token refresh endpoint
+      post "token/refresh", to: "token#refresh"
+
       resource :profile, only: [ :show, :update ], controller: :profiles
       resources :bookings
       resources :appliances do

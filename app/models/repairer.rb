@@ -39,6 +39,7 @@ class Repairer < ApplicationRecord
   has_many :reviews, dependent: :destroy
   has_many :appliances, through: :services
   has_many :messages, as: :sender, dependent: :destroy
+  has_many :refresh_tokens, dependent: :destroy
 
   validates :name, presence: true
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -47,9 +48,25 @@ class Repairer < ApplicationRecord
 
   has_secure_password
 
-  def generate_jwt
+  def generate_jwt(exp = 1.hour.from_now)
     # Ensure JwtToken class/module is available (e.g., require 'jwt_token' if needed)
-    JwtToken.encode({ repairer_id: id }, exp: 7.days.from_now)
+    JwtToken.encode({ repairer_id: id }, exp: exp)
+  end
+
+  def generate_refresh_token
+    RefreshToken.generate_for_repairer(self)
+  end
+
+  def generate_token_pair
+    access_token = generate_jwt
+    refresh_token = generate_refresh_token
+
+    {
+      access_token: access_token,
+      refresh_token: refresh_token.token,
+      expires_in: 3600, # 1 hour in seconds
+      token_type: "Bearer"
+    }
   end
 
   def available_time_slots(date)

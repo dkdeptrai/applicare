@@ -1,62 +1,83 @@
 require 'swagger_helper'
 
-RSpec.describe 'Api::V1::RepairerSessions', type: :request do
+RSpec.describe 'Repairer Sessions API', type: :request do
   path '/api/v1/repairer_sessions' do
-    post('Logs in a repairer') do
+    post 'Creates a repairer session (logs in)' do
       tags 'Repairer Authentication'
       consumes 'application/json'
       produces 'application/json'
-      parameter name: :credentials, in: :body, schema: {
+      parameter name: :login_params, in: :body, schema: {
         type: :object,
         properties: {
-          email_address: { type: :string, format: :email, example: 'repairer@example.com' },
-          password: { type: :string, format: :password, example: 'password123' }
+          email_address: { type: :string },
+          password: { type: :string }
         },
-        required: [ 'email_address', 'password' ]
+        required: %w[email_address password]
       }
 
-      response(201, 'login successful') do
-        let(:repairer) { create(:repairer, password: 'password123', password_confirmation: 'password123') }
-        let(:credentials) { { email_address: repairer.email_address, password: 'password123' } }
+      response '201', 'repairer logged in' do
+        let(:repairer) { create(:repairer, password: 'password123') }
+        let(:login_params) { { email_address: repairer.email_address, password: 'password123' } }
 
         schema type: :object,
                properties: {
-                 token: { type: :string, description: 'JWT authentication token' },
-                 repairer: { '$ref' => '#/components/schemas/repairer' } # Reference your repairer schema
+                 access_token: { type: :string },
+                 refresh_token: { type: :string },
+                 token_type: { type: :string },
+                 expires_in: { type: :integer },
+                 repairer: {
+                   type: :object,
+                   properties: {
+                     id: { type: :integer },
+                     name: { type: :string },
+                     email_address: { type: :string }
+                   }
+                 }
                },
-               required: [ 'token', 'repairer' ]
+               required: %w[access_token refresh_token token_type expires_in repairer]
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['token']).to be_a(String)
-          expect(data['repairer']['id']).to eq(repairer.id)
-          # Decode token to verify payload (optional but good)
-          decoded = JwtToken.decode(data['token'])
-          expect(decoded[:repairer_id]).to eq(repairer.id)
+          expect(data['access_token']).to be_present
+          expect(data['refresh_token']).to be_present
+          expect(data['token_type']).to eq('Bearer')
+          expect(data['expires_in']).to be_present
+          expect(data['repairer']).to be_present
         end
       end
 
-      response(401, 'invalid credentials - wrong password') do
-        let(:repairer) { create(:repairer, password: 'password123') }
-        let(:credentials) { { email_address: repairer.email_address, password: 'wrongpassword' } }
+      response '401', 'unauthorized - invalid credentials' do
+        let(:login_params) { { email_address: 'wrong@example.com', password: 'wrongpassword' } }
         run_test!
       end
+    end
+  end
 
-      response(401, 'invalid credentials - wrong email') do
-        let(:credentials) { { email_address: 'nonexistent@example.com', password: 'password123' } }
-        run_test!
-      end
+  path '/api/v1/repairer_sessions/{id}' do
+    delete 'Destroys a repairer session (logs out)' do
+      tags 'Repairer Authentication'
+      produces 'application/json'
+      parameter name: :id, in: :path, type: :string, description: 'ID is optional'
+      parameter name: 'Authorization', in: :header, type: :string, required: true, description: 'JWT token'
 
-      response(400, 'missing parameters') do
-        let(:credentials) { { email_address: 'test@example.com' } } # Missing password
-        # Rswag might need specific handling for bad request bodies depending on setup
-        # This test might pass validation before hitting the controller if schema is strict
-        # run_test! # May need adjustment based on actual 400 error handling
-        # For now, just document the possibility:
-        it 'returns 400 Bad Request if parameters are missing' do
-          post '/api/v1/repairer_sessions', params: credentials.to_json, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
-          expect(response).to have_http_status(:unauthorized) # Or potentially 400 depending on where validation fails
+      response '200', 'repairer logged out' do
+        let(:repairer) { create(:repairer) }
+        let(:token) { JwtToken.encode({ repairer_id: repairer.id }, exp: 7.days.from_now) }
+        let(:id) { 'current' }
+        let(:'Authorization') { "Bearer #{token}" }
+
+        before do
+          allow_any_instance_of(Api::V1::RepairerSessionsController).to receive(:current_repairer).and_return(repairer)
         end
+
+        run_test!
+      end
+
+      response '401', 'unauthorized' do
+        let(:id) { 'current' }
+        let(:'Authorization') { "Bearer invalid_token" }
+
+        run_test!
       end
     end
   end

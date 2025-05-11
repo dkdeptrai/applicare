@@ -12,11 +12,6 @@ RSpec.describe "Api::V1::RepairerBookings", type: :request do
   end
 
   describe "GET /api/v1/repairer/bookings" do
-    # All tests are temporarily pending until we fix the booking creation issues
-    before do
-      pending "Skipping test due to booking time slot validation issues"
-    end
-
     it "returns only the repairer's bookings" do
       # Create bookings
       create(:booking, repairer: repairer, start_time: Time.current.beginning_of_day + 10.hours)
@@ -50,11 +45,6 @@ RSpec.describe "Api::V1::RepairerBookings", type: :request do
   end
 
   describe "GET /api/v1/repairer/bookings/:id" do
-    # All tests are temporarily pending until we fix the booking creation issues
-    before do
-      pending "Skipping test due to booking time slot validation issues"
-    end
-
     it "returns the booking details" do
       get "/api/v1/repairer/bookings/#{booking.id}", headers: valid_headers
       expect(response).to have_http_status(:ok)
@@ -74,11 +64,6 @@ RSpec.describe "Api::V1::RepairerBookings", type: :request do
   end
 
   describe "PATCH /api/v1/repairer/bookings/:id" do
-    # All tests are temporarily pending until we fix the booking creation issues
-    before do
-      pending "Skipping test due to booking time slot validation issues"
-    end
-
     let(:valid_params) do
       {
         booking: {
@@ -107,25 +92,28 @@ RSpec.describe "Api::V1::RepairerBookings", type: :request do
   end
 
   describe "POST /api/v1/repairer/bookings/:id/notes" do
-    # All tests are temporarily pending until we fix the booking creation issues
-    before do
-      pending "Skipping test due to booking time slot validation issues"
-    end
-
     let(:valid_params) do
       {
         note: "Customer requested early morning appointment"
       }
     end
 
+    let(:invalid_params) do
+      {
+        note: ""
+      }
+    end
+
     it "adds a note to the booking" do
-      post "/api/v1/repairer/bookings/#{booking.id}/notes", params: valid_params.to_json, headers: valid_headers
+      expect {
+        post "/api/v1/repairer/bookings/#{booking.id}/notes", params: valid_params.to_json, headers: valid_headers
+      }.to change { booking.reload.repairer_note }.from(nil).to(valid_params[:note])
+
       expect(response).to have_http_status(:ok)
       expect(json_response["repairer_note"]).to eq(valid_params[:note])
     end
 
     it "returns 422 for empty note" do
-      invalid_params = { note: "" }
       post "/api/v1/repairer/bookings/#{booking.id}/notes", params: invalid_params.to_json, headers: valid_headers
       expect(response).to have_http_status(:unprocessable_entity)
     end

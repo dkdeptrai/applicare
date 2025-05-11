@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_11_075144) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_11_075565) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -69,6 +69,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_11_075144) do
     t.datetime "updated_at", null: false
     t.index ["booking_id"], name: "index_messages_on_booking_id"
     t.index ["sender_type", "sender_id"], name: "index_messages_on_sender"
+  end
+
+  create_table "refresh_tokens", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "repairer_id"
+    t.string "token"
+    t.datetime "expires_at"
+    t.boolean "used"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["repairer_id"], name: "index_refresh_tokens_on_repairer_id"
+    t.index ["user_id"], name: "index_refresh_tokens_on_user_id"
   end
 
   create_table "repairers", force: :cascade do |t|
@@ -149,6 +161,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_11_075144) do
   add_foreign_key "bookings", "services"
   add_foreign_key "bookings", "users"
   add_foreign_key "messages", "bookings"
+  add_foreign_key "refresh_tokens", "repairers"
+  add_foreign_key "refresh_tokens", "users"
   add_foreign_key "reviews", "bookings"
   add_foreign_key "reviews", "repairers"
   add_foreign_key "reviews", "users"

@@ -28,7 +28,7 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class BookingSerializer < ActiveModel::Serializer
-  attributes :id, :start_time, :end_time, :status, :address, :notes, :created_at, :updated_at, :repairer_id, :service_id
+  attributes :id, :start_time, :end_time, :status, :address, :notes, :repairer_note, :created_at, :updated_at, :repairer_id, :service_id, :user_id
   belongs_to :repairer
   belongs_to :user
   belongs_to :service

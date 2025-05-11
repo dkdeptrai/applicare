@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'Chat functionality', type: :feature, js: true do
+RSpec.describe 'Chat functionality', type: :system, js: true do
   let(:user) { create(:user, email_address: 'test_user@example.com', password: 'password123') }
   let(:repairer) { create(:repairer, email_address: 'test_repairer@example.com', password: 'password123') }
   let(:appliance) { create(:appliance) }

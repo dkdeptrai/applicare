@@ -28,13 +28,30 @@ class User < ApplicationRecord
   has_many :services, through: :bookings
   has_many :appliances, through: :services
   has_many :messages, as: :sender, dependent: :destroy
+  has_many :refresh_tokens, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :name, presence: true
 
-  def generate_jwt
-    JwtToken.encode({ user_id: id }, exp: 7.days.from_now)
+  def generate_jwt(exp = 1.hour.from_now)
+    JwtToken.encode({ user_id: id }, exp: exp)
+  end
+
+  def generate_refresh_token
+    RefreshToken.generate_for_user(self)
+  end
+
+  def generate_token_pair
+    access_token = generate_jwt
+    refresh_token = generate_refresh_token
+
+    {
+      access_token: access_token,
+      refresh_token: refresh_token.token,
+      expires_in: 3600, # 1 hour in seconds
+      token_type: "Bearer"
+    }
   end
 end

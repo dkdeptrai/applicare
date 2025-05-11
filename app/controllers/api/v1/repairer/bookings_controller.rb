@@ -172,6 +172,11 @@ module Api
         #       422:
         #         description: Validation error
         def notes
+          if params[:note].blank?
+            render json: { errors: [ "Note cannot be blank" ] }, status: :unprocessable_entity
+            return
+          end
+
           if @booking.update(repairer_note: params[:note])
             render json: @booking, serializer: BookingSerializer
           else

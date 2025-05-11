@@ -21,14 +21,20 @@ RSpec.describe 'Sessions API', type: :request do
 
         schema type: :object,
                properties: {
-                 token: { type: :string },
+                 access_token: { type: :string },
+                 refresh_token: { type: :string },
+                 token_type: { type: :string },
+                 expires_in: { type: :integer },
                  user_id: { type: :integer }
                },
-               required: %w[token user_id]
+               required: %w[access_token refresh_token token_type expires_in user_id]
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['token']).to be_present
+          expect(data['access_token']).to be_present
+          expect(data['refresh_token']).to be_present
+          expect(data['token_type']).to eq('Bearer')
+          expect(data['expires_in']).to be_present
           expect(data['user_id']).to eq(user.id)
         end
       end

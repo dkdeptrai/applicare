@@ -27,6 +27,9 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
   let(:repairer) { create(:repairer) }
   let(:auth_token) { generate_repairer_jwt(repairer) }
 
+  # JWT Authorization header
+  let(:Authorization) { "Bearer #{auth_token}" }
+
   path '/api/v1/repairer/bookings' do
     get 'Lists all bookings for the authenticated repairer' do
       tags 'Repairer Bookings'
@@ -49,12 +52,11 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
           create(:booking, repairer: create(:repairer), status: 'pending', start_time: Time.current.beginning_of_day + 10.hours)
         end
 
-        let(:'Authorization') { "Bearer #{auth_token}" }
         run_test!
       end
 
       response '401', 'unauthorized' do
-        let(:'Authorization') { 'Bearer invalid_token' }
+        let(:Authorization) { 'Bearer invalid_token' }
         run_test!
       end
     end
@@ -74,21 +76,19 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
 
         let(:booking) { create(:booking, repairer: repairer, start_time: Time.current.beginning_of_day + 9.hours) }
         let(:id) { booking.id }
-        let(:'Authorization') { "Bearer #{auth_token}" }
 
         run_test!
       end
 
       response '404', 'booking not found' do
         let(:id) { 999999 }
-        let(:'Authorization') { "Bearer #{auth_token}" }
         run_test!
       end
 
       response '401', 'unauthorized' do
         let(:booking) { create(:booking, repairer: repairer, start_time: Time.current.beginning_of_day + 9.hours) }
         let(:id) { booking.id }
-        let(:'Authorization') { 'Bearer invalid_token' }
+        let(:Authorization) { 'Bearer invalid_token' }
         run_test!
       end
     end
@@ -118,7 +118,6 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
 
         let(:booking_object) { create(:booking, repairer: repairer, status: 'pending', start_time: Time.current.beginning_of_day + 9.hours) }
         let(:id) { booking_object.id }
-        let(:'Authorization') { "Bearer #{auth_token}" }
         let(:booking) do
           {
             booking: {
@@ -133,7 +132,6 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
       response '422', 'invalid request' do
         let(:booking_obj) { create(:booking, repairer: repairer, status: 'pending', start_time: Time.current.beginning_of_day + 9.hours) }
         let(:id) { booking_obj.id }
-        let(:'Authorization') { "Bearer #{auth_token}" }
         let(:booking) do
           {
             booking: {
@@ -147,7 +145,6 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
 
       response '404', 'booking not found' do
         let(:id) { 999999 }
-        let(:'Authorization') { "Bearer #{auth_token}" }
         let(:booking) do
           {
             booking: {
@@ -162,7 +159,7 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
       response '401', 'unauthorized' do
         let(:booking_obj) { create(:booking, repairer: repairer, status: 'pending', start_time: Time.current.beginning_of_day + 9.hours) }
         let(:id) { booking_obj.id }
-        let(:'Authorization') { 'Bearer invalid_token' }
+        let(:Authorization) { 'Bearer invalid_token' }
         let(:booking) do
           {
             booking: {
@@ -198,7 +195,6 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
 
         let(:booking) { create(:booking, repairer: repairer, start_time: Time.current.beginning_of_day + 9.hours) }
         let(:id) { booking.id }
-        let(:'Authorization') { "Bearer #{auth_token}" }
         let(:note_params) do
           {
             note: 'Customer requested early morning appointment'
@@ -211,7 +207,6 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
       response '422', 'invalid request' do
         let(:booking) { create(:booking, repairer: repairer, start_time: Time.current.beginning_of_day + 9.hours) }
         let(:id) { booking.id }
-        let(:'Authorization') { "Bearer #{auth_token}" }
         let(:note_params) do
           {
             note: ''
@@ -223,7 +218,6 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
 
       response '404', 'booking not found' do
         let(:id) { 999999 }
-        let(:'Authorization') { "Bearer #{auth_token}" }
         let(:note_params) do
           {
             note: 'Customer requested early morning appointment'
@@ -236,7 +230,7 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
       response '401', 'unauthorized' do
         let(:booking) { create(:booking, repairer: repairer, start_time: Time.current.beginning_of_day + 9.hours) }
         let(:id) { booking.id }
-        let(:'Authorization') { 'Bearer invalid_token' }
+        let(:Authorization) { 'Bearer invalid_token' }
         let(:note_params) do
           {
             note: 'Customer requested early morning appointment'
