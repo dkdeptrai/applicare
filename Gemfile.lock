@@ -363,6 +363,7 @@ GEM
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
     rubyzip (2.4.1)
+    runner (0.0.0)
     securerandom (0.4.1)
     selenium-webdriver (4.10.0)
       rexml (~> 3.2, >= 3.2.5)
@@ -480,6 +481,7 @@ DEPENDENCIES
   rspec-rails
   rswag (~> 2.16)
   rubocop-rails-omakase
+  runner (~> 0.0.0)
   selenium-webdriver
   shoulda-matchers
   solid_cable

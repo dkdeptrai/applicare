@@ -11,8 +11,9 @@ module Api
       end
 
       def create
-        @message = current_entity.messages.new(message_params)
+        @message = Message.new(message_params)
         @message.booking = @booking
+        @message.sender = current_entity
 
         if @message.save
           render json: @message, status: :created
@@ -30,15 +31,29 @@ module Api
       end
 
       def authorize_booking_access
-        authorized = if current_entity.is_a?(User)
-                      @booking.user_id == current_entity.id
-        elsif current_entity.is_a?(Repairer)
-                      @booking.repairer_id == current_entity.id
+        # Check for current repairer specifically first to handle that case separately
+        if current_repairer
+          authorized = (@booking.repairer_id == current_repairer.id)
+          unless authorized
+            Rails.logger.info "Access denied: Repairer ID #{current_repairer.id} tried to access booking ID #{@booking.id} which belongs to repairer ID #{@booking.repairer_id}"
+            render json: { error: "Unauthorized. This booking does not belong to you." }, status: :forbidden
+            return
+          end
+          true # Allow access
+        elsif current_user
+          authorized = (@booking.user_id == current_user.id)
+          unless authorized
+            Rails.logger.info "Access denied: User ID #{current_user.id} tried to access booking ID #{@booking.id} which belongs to user ID #{@booking.user_id}"
+            render json: { error: "Unauthorized. This booking does not belong to you." }, status: :forbidden
+            return
+          end
+          true # Allow access
         else
-                      false
+          # No authenticated entity found
+          Rails.logger.info "Access denied: No authenticated entity found"
+          render json: { error: "Unauthorized. Authentication required." }, status: :forbidden
+          false
         end
-
-        render json: { error: "Unauthorized" }, status: :forbidden unless authorized
       end
 
       def message_params

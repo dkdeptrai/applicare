@@ -55,6 +55,23 @@ RSpec.configure do |config|
             },
             required: [ 'id', 'name', 'email_address' ] # Adjust required fields as needed
           },
+          customer: {
+            type: :object,
+            properties: {
+              id: { type: :integer, description: 'User ID' },
+              name: { type: :string, description: 'Customer name' },
+              email_address: { type: :string, format: :email, description: 'Customer email' },
+              address: { type: :string, description: 'Customer address' },
+              date_of_birth: { type: :string, format: 'date', nullable: true, description: 'Customer date of birth' },
+              mobile_number: { type: :string, nullable: true, description: 'Customer phone number' },
+              latitude: { type: :number, format: :float, nullable: true, description: 'Latitude' },
+              longitude: { type: :number, format: :float, nullable: true, description: 'Longitude' },
+              onboarded: { type: :boolean, description: 'Whether the customer has completed onboarding' },
+              created_at: { type: :string, format: 'date-time', description: 'Creation timestamp' },
+              updated_at: { type: :string, format: 'date-time', description: 'Last update timestamp' }
+            },
+            required: [ 'id', 'name', 'email_address', 'onboarded' ]
+          },
           booking: {
             type: :object,
             properties: {

@@ -605,6 +605,217 @@ paths:
           description: booking not found
         '401':
           description: unauthorized
+  "/api/v1/customers":
+    get:
+      summary: Retrieves all customers for the authenticated repairer
+      tags:
+      - Customers
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: JWT token for repairer authentication
+        schema:
+          type: string
+      responses:
+        '200':
+          description: customers found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    email_address:
+                      type: string
+                    address:
+                      type: string
+                    date_of_birth:
+                      type: string
+                      format: date
+                      nullable: true
+                    mobile_number:
+                      type: string
+                      nullable: true
+                    latitude:
+                      type: number
+                      format: float
+                      nullable: true
+                    longitude:
+                      type: number
+                      format: float
+                      nullable: true
+                    onboarded:
+                      type: boolean
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                  required:
+                  - id
+                  - name
+                  - email_address
+                  - onboarded
+        '401':
+          description: unauthorized
+        '403':
+          description: forbidden - not a repairer
+  "/api/v1/customers/{id}":
+    get:
+      summary: Retrieves a specific customer
+      tags:
+      - Customers
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: JWT token for repairer authentication
+        schema:
+          type: string
+      - name: id
+        in: path
+        description: ID of the customer
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: customer found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  email_address:
+                    type: string
+                  address:
+                    type: string
+                  date_of_birth:
+                    type: string
+                    format: date
+                    nullable: true
+                  mobile_number:
+                    type: string
+                    nullable: true
+                  latitude:
+                    type: number
+                    format: float
+                    nullable: true
+                  longitude:
+                    type: number
+                    format: float
+                    nullable: true
+                  onboarded:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                required:
+                - id
+                - name
+                - email_address
+                - onboarded
+        '404':
+          description: customer not found or not associated with repairer
+        '401':
+          description: unauthorized
+        '403':
+          description: forbidden - not a repairer
+  "/api/v1/customers/{id}/bookings":
+    get:
+      summary: Retrieves a customer's bookings with the repairer
+      tags:
+      - Customers
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: JWT token for repairer authentication
+        schema:
+          type: string
+      - name: id
+        in: path
+        description: ID of the customer
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: bookings found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    repairer_id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    service_id:
+                      type: integer
+                    start_time:
+                      type: string
+                      format: date-time
+                    end_time:
+                      type: string
+                      format: date-time
+                    status:
+                      type: string
+                      enum:
+                      - pending
+                      - confirmed
+                      - cancelled
+                      - completed
+                    address:
+                      type: string
+                    notes:
+                      type: string
+                      nullable: true
+                    repairer_note:
+                      type: string
+                      nullable: true
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                  required:
+                  - id
+                  - repairer_id
+                  - user_id
+                  - service_id
+                  - start_time
+                  - end_time
+                  - status
+        '404':
+          description: customer not found or not associated with repairer
+        '401':
+          description: unauthorized
   "/api/v1/profile":
     get:
       summary: Retrieves the current user profile
@@ -1530,6 +1741,57 @@ components:
       - id
       - name
       - email_address
+    customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: User ID
+        name:
+          type: string
+          description: Customer name
+        email_address:
+          type: string
+          format: email
+          description: Customer email
+        address:
+          type: string
+          description: Customer address
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+          description: Customer date of birth
+        mobile_number:
+          type: string
+          nullable: true
+          description: Customer phone number
+        latitude:
+          type: number
+          format: float
+          nullable: true
+          description: Latitude
+        longitude:
+          type: number
+          format: float
+          nullable: true
+          description: Longitude
+        onboarded:
+          type: boolean
+          description: Whether the customer has completed onboarding
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      required:
+      - id
+      - name
+      - email_address
+      - onboarded
     booking:
       type: object
       properties:

@@ -87,3 +87,5 @@ gem "cloudinary", "~> 2.3"
 gem "activesupport", "~> 8.0"
 
 gem "annotaterb", "~> 4.14"
+
+gem "runner", "~> 0.0.0"

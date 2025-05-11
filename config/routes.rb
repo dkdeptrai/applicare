@@ -35,6 +35,14 @@ Rails.application.routes.draw do
       resources :bookings, only: [] do
         resources :messages, only: [ :index ]
       end
+
+      # Customer information routes
+      resources :customers, only: [ :index, :show ] do
+        member do
+          get :bookings
+        end
+      end
+
       resources :repairers, only: [] do
         member do
           get "calendar/:year/:month", to: "repairers#calendar"
