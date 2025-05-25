@@ -34,7 +34,7 @@ FactoryBot.define do
     user
     service
     start_time { Time.current.next_occurring(:monday).change(hour: 10) }
-    status { 'pending' }
+    status { 'PENDING' }
     address { Faker::Address.full_address }
 
     # Calculate end_time only if start_time is present
@@ -61,15 +61,15 @@ FactoryBot.define do
     end
 
     trait :confirmed do
-      status { 'confirmed' }
+      status { 'CONFIRMED' }
     end
 
     trait :cancelled do
-      status { 'cancelled' }
+      status { 'DONE' }
     end
 
     trait :completed do
-      status { 'completed' }
+      status { 'DONE' }
     end
   end
 end

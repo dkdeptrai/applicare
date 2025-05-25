@@ -2,7 +2,7 @@ module Api
   module V1
     class AppliancesController < BaseController
       skip_before_action :authenticate_request, only: [ :index, :show ]
-      before_action :set_appliance, only: [ :show, :update, :destroy, :bookings ]
+      before_action :set_appliance, only: [ :show, :update, :destroy, :bookings, :repair_history ]
 
       def index
         @appliances = Appliance.all
@@ -23,18 +23,25 @@ module Api
         render json: @bookings, each_serializer: BookingSerializer
       end
 
+      def repair_history
+        unless @appliance.user == current_user
+          return render json: { error: "Not authorized" }, status: :forbidden
+        end
+        bookings = @appliance.bookings
+        bookings = bookings.where(status: params[:status]) if params[:status].present?
+        render json: bookings, each_serializer: BookingSerializer
+      end
+
       def create
         @appliance = Appliance.new(appliance_params)
+        @appliance.user = current_user
 
-        # Handle image upload if provided
         if params[:image].present?
           begin
-            result = Cloudinary::Uploader.upload(params[:image].tempfile, folder: "appliances")
+            result = Cloudinary::Uploader.upload(params[:image], folder: "appliances")
             @appliance.image_url = result["secure_url"]
           rescue Cloudinary::CloudinaryException => e
             return render json: { error: "Cloudinary upload failed: #{e.message}" }, status: :internal_server_error
-          rescue => e
-            return render json: { error: "An unexpected error occurred: #{e.message}" }, status: :internal_server_error
           end
         end
 
@@ -46,17 +53,13 @@ module Api
       end
 
       def update
-        # Handle image upload if provided
         if params[:image].present?
           begin
-            result = Cloudinary::Uploader.upload(params[:image].tempfile, folder: "appliances")
-            # If there was a previous image, we could delete it here
-            params[:appliance] = {} unless params[:appliance]
+            result = Cloudinary::Uploader.upload(params[:image], folder: "appliances")
+            params[:appliance] ||= {}
             params[:appliance][:image_url] = result["secure_url"]
           rescue Cloudinary::CloudinaryException => e
             return render json: { error: "Cloudinary upload failed: #{e.message}" }, status: :internal_server_error
-          rescue => e
-            return render json: { error: "An unexpected error occurred: #{e.message}" }, status: :internal_server_error
           end
         end
 

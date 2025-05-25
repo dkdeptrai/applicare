@@ -97,18 +97,18 @@ RSpec.describe Booking, type: :model do
       expect(booking.status).to eq('confirmed')
     end
 
-    it 'allows transition from pending to cancelled' do
-      booking = create(:booking, repairer: repairer, user: user, service: service)
-      booking.status = 'cancelled'
+    it 'allows transition from confirmed to coming' do
+      booking = create(:booking, :confirmed, repairer: repairer, user: user, service: service)
+      booking.status = 'coming'
       expect(booking).to be_valid
-      expect(booking.status).to eq('cancelled')
+      expect(booking.status).to eq('coming')
     end
 
-    it 'allows transition from confirmed to completed' do
-      booking = create(:booking, :confirmed, repairer: repairer, user: user, service: service)
-      booking.status = 'completed'
+    it 'allows transition from coming to done' do
+      booking = create(:booking, repairer: repairer, user: user, service: service, status: 'coming')
+      booking.status = 'done'
       expect(booking).to be_valid
-      expect(booking.status).to eq('completed')
+      expect(booking.status).to eq('done')
     end
   end
 

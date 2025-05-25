@@ -48,7 +48,7 @@ class Review < ApplicationRecord
   def booking_is_completed
     return unless booking
     # Adjust "completed" if your status is different
-    errors.add(:booking, "must be completed before reviewing") unless booking.status == "completed"
+    errors.add(:booking, "must be completed before reviewing") unless booking.status == "DONE"
   end
 
   def update_repairer_ratings

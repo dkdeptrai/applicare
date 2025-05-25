@@ -4,7 +4,8 @@ module Api
       skip_before_action :authenticate_request, only: [ :create ]
 
       def create
-        user = User.find_by(email_address: params[:email_address])
+        normalized_email = params[:email_address].to_s.strip.downcase
+        user = User.find_by(email_address: normalized_email)
         if user&.authenticate(params[:password])
           token_response = user.generate_token_pair
           render json: token_response.merge(user_id: user.id), status: :ok

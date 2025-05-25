@@ -15,9 +15,9 @@ user1 = User.create!(name: "Alice Smith", email_address: "alice@example.com", pa
 user2 = User.create!(name: "Bob Johnson", email_address: "bob@example.com", password: "password123")
 
 puts "Creating Appliances..."
-appliance_fridge = Appliance.create!(name: "Refrigerator")
-appliance_oven = Appliance.create!(name: "Oven")
-appliance_washer = Appliance.create!(name: "Washing Machine")
+appliance_fridge = Appliance.create!(name: "Refrigerator", user: user1)
+appliance_oven = Appliance.create!(name: "Oven", user: user1)
+appliance_washer = Appliance.create!(name: "Washing Machine", user: user1)
 
 puts "Creating Repairers..."
 repairer1 = Repairer.create!(

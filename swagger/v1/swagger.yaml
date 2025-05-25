@@ -390,6 +390,78 @@ paths:
           description: appliance not found
         '401':
           description: unauthorized
+  "/api/v1/appliances/{id}/repair_history":
+    parameters:
+    - name: id
+      in: path
+      description: ID of the appliance
+      required: true
+      schema:
+        type: integer
+    - name: status
+      in: query
+      required: false
+      description: Filter by booking status
+      schema:
+        type: string
+    get:
+      summary: Fetches the full repair history for an appliance (owner only)
+      tags:
+      - Appliances
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: JWT token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: repair history filtered by status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    repairer_id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    service_id:
+                      type: integer
+                    start_time:
+                      type: string
+                      format: date-time
+                    end_time:
+                      type: string
+                      format: date-time
+                    status:
+                      type: string
+                    address:
+                      type: string
+                    notes:
+                      type: string
+                      nullable: true
+                    repairer_note:
+                      type: string
+                      nullable: true
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                  required:
+                  - id
+                  - status
+        '403':
+          description: not authorized
+        '404':
+          description: appliance not found
   "/api/v1/bookings":
     get:
       summary: Retrieves all bookings for the current user
@@ -990,10 +1062,10 @@ paths:
         schema:
           type: string
           enum:
-          - pending
-          - confirmed
-          - completed
-          - cancelled
+          - PENDING
+          - CONFIRMED
+          - COMING
+          - DONE
         required: false
         description: Filter by booking status
       - name: start_date
@@ -1091,9 +1163,9 @@ paths:
                     status:
                       type: string
                       enum:
-                      - confirmed
-                      - completed
-                      - cancelled
+                      - CONFIRMED
+                      - COMING
+                      - DONE
                   required:
                   - status
               required:

@@ -10,7 +10,7 @@ module Api
 
       def create
         @booking = current_user.bookings.build(booking_params)
-        @booking.status = "pending"
+        @booking.status = :pending
 
         if @booking.save
           render json: @booking, serializer: BookingSerializer, status: :created
@@ -32,7 +32,7 @@ module Api
       end
 
       def destroy
-        @booking.update(status: "cancelled")
+        @booking.update(status: :done)
         head :no_content
       end
 

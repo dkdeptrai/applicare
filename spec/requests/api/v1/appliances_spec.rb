@@ -6,7 +6,7 @@ RSpec.describe Api::V1::AppliancesController, type: :request do
 
   let!(:user) { create(:user, email_address: "test_user_#{rand(1000)}@example.com", password: 'password123') }
   let!(:repairer) { create(:repairer, email_address: "test_repairer_#{rand(1000)}@example.com", password: 'password123') }
-  let!(:appliances) { create_list(:appliance, 3) }
+  let!(:appliances) { create_list(:appliance, 3, user: user) }
   let!(:appliance) { appliances.first }
   let!(:service) { create(:service, repairer: repairer, appliance: appliance) }
 
@@ -312,6 +312,83 @@ RSpec.describe Api::V1::AppliancesController, type: :request do
         let(:id) { appliance.id }
         let(:'Authorization') { 'Bearer invalid_token' }
         run_test!
+      end
+    end
+  end
+
+  path '/api/v1/appliances/{id}/repair_history' do
+    parameter name: :id, in: :path, type: :integer, description: 'ID of the appliance'
+    parameter name: :status, in: :query, type: :string, required: false, description: 'Filter by booking status'
+
+    get 'Fetches the full repair history for an appliance (owner only)' do
+      tags 'Appliances'
+      produces 'application/json'
+      parameter name: 'Authorization', in: :header, type: :string, required: true, description: 'JWT token'
+
+      response '200', 'repair history found' do
+        schema type: :array,
+               items: {
+                 type: :object,
+                 properties: {
+                   id: { type: :integer },
+                   repairer_id: { type: :integer },
+                   user_id: { type: :integer },
+                   service_id: { type: :integer },
+                   start_time: { type: :string, format: 'date-time' },
+                   end_time: { type: :string, format: 'date-time' },
+                   status: { type: :string },
+                   address: { type: :string },
+                   notes: { type: :string, nullable: true },
+                   repairer_note: { type: :string, nullable: true },
+                   created_at: { type: :string, format: 'date-time' },
+                   updated_at: { type: :string, format: 'date-time' }
+                 },
+                 required: %w[id repairer_id user_id service_id start_time end_time status address]
+               }
+        let(:id) { appliance.id }
+        let(:'Authorization') { headers['Authorization'] }
+        run_test! do |response|
+          expect(response.status).to eq(200)
+          json = JSON.parse(response.body)
+          expect(json).to be_an(Array)
+          expect(json.map { |b| b['id'] }).to include(booking1.id, booking2.id)
+        end
+      end
+
+      response '200', 'repair history filtered by status' do
+        schema type: :array,
+               items: {
+                 type: :object,
+                 properties: {
+                   id: { type: :integer },
+                   status: { type: :string }
+                 },
+                 required: %w[id status]
+               }
+        let(:id) { appliance.id }
+        let(:'Authorization') { headers['Authorization'] }
+        let(:status) { booking1.status }
+        run_test! do |response|
+          expect(response.status).to eq(200)
+          json = JSON.parse(response.body)
+          expect(json).to all(include('status' => booking1.status))
+        end
+      end
+
+      response '403', 'not authorized' do
+        let(:id) { appliance.id }
+        let(:'Authorization') { repairer_headers['Authorization'] }
+        run_test! do |response|
+          expect(response.status).to eq(403)
+        end
+      end
+
+      response '404', 'appliance not found' do
+        let(:id) { 999_999 }
+        let(:'Authorization') { headers['Authorization'] }
+        run_test! do |response|
+          expect(response.status).to eq(404)
+        end
       end
     end
   end

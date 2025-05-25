@@ -126,10 +126,14 @@ module Api
         #       422:
         #         description: Validation error
         def update
-          if @booking.update(repairer_booking_params)
-            render json: @booking, serializer: BookingSerializer
-          else
-            render json: { errors: @booking.errors.full_messages }, status: :unprocessable_entity
+          begin
+            if @booking.update(repairer_booking_params)
+              render json: @booking, serializer: BookingSerializer
+            else
+              render json: { errors: @booking.errors.full_messages }, status: :unprocessable_entity
+            end
+          rescue ArgumentError => e
+            render json: { errors: [ e.message ] }, status: :unprocessable_entity
           end
         end
 

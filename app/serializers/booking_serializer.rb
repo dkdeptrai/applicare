@@ -8,7 +8,7 @@
 #  notes         :text
 #  repairer_note :text
 #  start_time    :datetime
-#  status        :string
+#  status        :string           # ENUM: PENDING, CONFIRMED, COMING, DONE
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  repairer_id   :bigint           not null
@@ -32,4 +32,8 @@ class BookingSerializer < ActiveModel::Serializer
   belongs_to :repairer
   belongs_to :user
   belongs_to :service
+
+  def status
+    object.status
+  end
 end

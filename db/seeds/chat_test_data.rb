@@ -46,11 +46,11 @@ end
 # Create test appliances if they don't exist
 puts "Creating test appliances..."
 appliances = [
-  { name: "Refrigerator", brand: "Samsung", model: "RF28R7351SG" },
-  { name: "Washing Machine", brand: "LG", model: "WM3900HWA" },
-  { name: "Dishwasher", brand: "Bosch", model: "SHEM63W55N" },
-  { name: "Microwave", brand: "Panasonic", model: "NN-SN686S" },
-  { name: "Air Conditioner", brand: "Daikin", model: "FTXR36TVJUA" }
+  { name: "Refrigerator", brand: "Samsung", model: "RF28R7351SG", user: user },
+  { name: "Washing Machine", brand: "LG", model: "WM3900HWA", user: user },
+  { name: "Dishwasher", brand: "Bosch", model: "SHEM63W55N", user: user },
+  { name: "Microwave", brand: "Panasonic", model: "NN-SN686S", user: user },
+  { name: "Air Conditioner", brand: "Daikin", model: "FTXR36TVJUA", user: user }
 ]
 
 created_appliances = []
@@ -121,7 +121,7 @@ start_times = [
   3.days.from_now.change(hour: 15, min: 0)
 ]
 
-statuses = [ "pending", "confirmed", "completed" ]
+statuses = [ "PENDING", "CONFIRMED", "COMING" ]
 service_indices = [ 0, 1, 2 ]
 
 bookings = []
@@ -193,5 +193,18 @@ unless Message.where(booking_id: first_booking.id).exists?
 
   puts "Created test messages for booking ##{first_booking.id}"
 end
+
+# Add a booking with status DONE
+booking = Booking.create!(
+  user: user,
+  repairer: repairer,
+  service: created_services.first,
+  start_time: 4.days.from_now.change(hour: 11, min: 0),
+  end_time: 4.days.from_now.change(hour: 12, min: 0),
+  status: "DONE",
+  address: user.address,
+  notes: "Completed booking."
+)
+puts "Created booking with status DONE on #{booking.start_time.strftime('%Y-%m-%d at %H:%M')}"
 
 puts "Test data creation completed!"

@@ -33,9 +33,16 @@ class Booking < ApplicationRecord
   belongs_to :service
   has_many :messages, dependent: :destroy
 
+  enum :status, {
+    pending: "PENDING",
+    confirmed: "CONFIRMED",
+    coming: "COMING",
+    done: "DONE"
+  }, prefix: true, default: "PENDING"
+
   validates :start_time, presence: true
   validates :end_time, presence: true
-  validates :status, presence: true, inclusion: { in: %w[pending confirmed cancelled completed] }
+  validates :status, presence: true
   validates :address, presence: true
   validate :time_slot_available
   validate :end_time_after_start_time

@@ -36,7 +36,7 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
       produces 'application/json'
       security [ Bearer: [] ]
       parameter name: 'Authorization', in: :header, type: :string, required: true, description: 'Bearer token'
-      parameter name: :status, in: :query, schema: { type: :string, enum: [ 'pending', 'confirmed', 'completed', 'cancelled' ] }, required: false, description: 'Filter by booking status'
+      parameter name: :status, in: :query, schema: { type: :string, enum: [ 'PENDING', 'CONFIRMED', 'COMING', 'DONE' ] }, required: false, description: 'Filter by booking status'
       parameter name: :start_date, in: :query, schema: { type: :string, format: :date }, required: false, description: 'Filter bookings from this date (YYYY-MM-DD)'
       parameter name: :end_date, in: :query, schema: { type: :string, format: :date }, required: false, description: 'Filter bookings until this date (YYYY-MM-DD)'
 
@@ -105,7 +105,7 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
           booking: {
             type: :object,
             properties: {
-              status: { type: :string, enum: [ 'confirmed', 'completed', 'cancelled' ] }
+              status: { type: :string, enum: [ 'CONFIRMED', 'COMING', 'DONE' ] }
             },
             required: [ 'status' ]
           }
@@ -121,7 +121,7 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
         let(:booking) do
           {
             booking: {
-              status: 'confirmed'
+              status: 'CONFIRMED'
             }
           }
         end
@@ -148,7 +148,7 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
         let(:booking) do
           {
             booking: {
-              status: 'confirmed'
+              status: 'CONFIRMED'
             }
           }
         end
@@ -163,7 +163,7 @@ RSpec.describe 'Api::V1::Repairer::Bookings', type: :request do
         let(:booking) do
           {
             booking: {
-              status: 'confirmed'
+              status: 'CONFIRMED'
             }
           }
         end

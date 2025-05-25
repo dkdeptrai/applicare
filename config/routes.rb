@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       resources :appliances do
         member do
           get :bookings
+          get :repair_history
         end
         collection do
           get :my_appliances

@@ -26,7 +26,7 @@ class User < ApplicationRecord
   has_many :bookings, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :services, through: :bookings
-  has_many :appliances, through: :services
+  has_many :appliances, dependent: :destroy
   has_many :messages, as: :sender, dependent: :destroy
   has_many :refresh_tokens, dependent: :destroy
 
